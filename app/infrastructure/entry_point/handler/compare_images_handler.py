@@ -7,10 +7,11 @@ def compare_images_handler():
     Returns:
         dict: A dictionary containing keys 'Brightest_img' and 'Sharptest_img' with their respective values.
     """
-    img_1 = 'buena.jpg'
-    img_2 = 'mala.jpg'
+    img_1 = 'buena_fixed.png'
+    img_2 = 'mala_fixed.png'
+    img_3 = 'peldar.jpeg'
     message = []
-    message = read_image(img_1,img_2)
+    message = read_image(img_2,img_3)
     response= {
         "Brightest_img": message[0],
         "Sharptest_img": message[1]
