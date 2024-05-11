@@ -9,6 +9,15 @@ router = APIRouter()
 async def read_hello_world(bodyRequest: HelloWorldRequest):
     return create_message(bodyRequest.name)
 
-@router.get("/compare-images")
+@router.get("/compare-images", response_model=dict, summary="Compare two images",
+            description="Compares two predetermined images and identifies the one with greater brightness and sharper edges.")
 async def read_compare_images():
+    """
+    Endpoint to compare two images and return the results as JSON.
+
+    This function wraps the `compare_images_handler` which processes the actual image comparison.
+
+    Returns:
+        dict: JSON object with the brightest and sharpest images' information.
+    """
     return compare_images_handler()
