@@ -5,6 +5,7 @@ from dependency_injector import containers, providers
 from app.application.handler import Handlers
 from app.domain.usecase.user_usecase import UserUseCase
 from app.domain.usecase.auth_usecase import AuthUseCase
+from app.domain.usecase.image_usecase import ImageUseCase
 from app.infrastructure.driven_adapter.persistence.service.persistence import Persistence
 from app.infrastructure.driven_adapter.persistence.config.database import SessionLocal
 
@@ -41,5 +42,10 @@ class Container(containers.DeclarativeContainer):
     auth_usecase: Final = providers.Factory(
         AuthUseCase,
         persistence_gateway=persistence_gateway
+    )
+
+    # Caso de uso para imágenes
+    image_usecase: Final = providers.Factory(
+        ImageUseCase
     )
 
