@@ -42,17 +42,14 @@ async def upload_image(
     """
     logger.info("Iniciando subida de imagen")
     try:
-        # Validar tipo de archivo
         if not file.content_type.startswith('image/'):
             raise HTTPException(
                 status_code=400,
                 detail="El archivo debe ser una imagen"
             )
         
-        # Procesar la imagen
-        image_info = await image_usecase.upload_image(file)
+        image_info = await image_usecase.execute(file)
         
-        # Crear respuesta
         response_data = ImageUploadResponse(**image_info).model_dump()
         
         return JSONResponse(
