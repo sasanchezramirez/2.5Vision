@@ -11,11 +11,13 @@ from app.domain.usecase.util.geolocalization_utils import GeolocalizationUtils
 from app.domain.gateway.siata_gateway import SiataGateway
 from app.domain.model.gps import GPS
 from app.domain.model.pm_estimation import PMEstimation
+from app.domain.model.zones import ZoneDictionary
 logger: Final[logging.Logger] = logging.getLogger("Image UseCase")
 
 class ImageUseCase:
     def __init__(self, siata_gateway: SiataGateway):
         self.siata_gateway = siata_gateway
+        self.zone_dictionary = ZoneDictionary()
 
     async def execute(self, file: UploadFile) -> PMEstimation:
         """
@@ -37,9 +39,9 @@ class ImageUseCase:
         gps_data = self._get_gps_data(file)
         roi_image = ROIUtils.get_roi(normalized_image)
         feature_vector = self._image_processing(roi_image)
-        pm_data = self.get_pm_data(gps_data)
-        pm_estimation = self.get_pm_estimation(pm_data, feature_vector)
-        pm_qualitative_estimation = self.get_pm_qualitative_estimation(pm_estimation)
+        pm_data = self._get_pm_data(gps_data)
+        pm_estimation = self._get_pm_estimation(pm_data, feature_vector)
+        pm_qualitative_estimation = self._get_pm_qualitative_estimation(pm_estimation)
         return PMEstimation(pm_estimation=pm_estimation[0], pm_estimation_confidence=pm_estimation[1], pm_qualitative_estimation=pm_qualitative_estimation)
 
     def _image_normalization(self, image: Image) -> Image:
@@ -103,22 +105,25 @@ class ImageUseCase:
         gps_longitude = gps["longitude"]
         gps_longitude_ref = gps.get(piexif.GPSIFD.GPSLongitudeRef).decode()
         latitude = GeolocalizationUtils.dms_to_decimal(gps_latitude, gps_latitude_ref)
-        longitude = GeolocalizationUtils.dms_to_decimal(gps_longitude, gps_longitude_ref)
-        return GPS(latitude=latitude, longitude=longitude, zone=0)
+        longitude = GeolocalizationUtils.dms_to_decimal(gps_longitude, gps_longitude_ref)        
+        gps_obj = GPS(latitude=latitude, longitude=longitude, zone=0)
+        zone = self.zone_dictionary.get_zone(gps_obj)
+        
+        return GPS(latitude=latitude, longitude=longitude, zone=zone)
     
-    def get_pm_data(self, gps_data: GPS) -> list[float]:
+    def _get_pm_data(self, gps_data: GPS) -> list[float]:
         """
-        Obtiene los datos de la imagen.   
+        Obtiene los datos de material particulado de la zona estipulada usando la información de SIATA.   
 
         Args:
-            image: Imagen a verificar
+            gps_data: Datos de la zona geográfica de la imagen
 
         Returns:
             list[float]: Datos del material particulado de la zona
         """
         pass
 
-    def get_pm_estimation(self, pm_data: list[float], feature_vector: list[float]) -> list[float]:
+    def _get_pm_estimation(self, pm_data: list[float], feature_vector: list[float]) -> list[float]:
         """
         Obtiene la estimación de la cantidad de material particulado presente.
 
@@ -131,7 +136,7 @@ class ImageUseCase:
         """
         pass
 
-    def get_pm_qualitative_estimation(self, pm_estimation: float) -> str:
+    def _get_pm_qualitative_estimation(self, pm_estimation: float) -> str:
         """
         Obtiene la estimación cualitativa de la cantidad de material particulado presente.
 
