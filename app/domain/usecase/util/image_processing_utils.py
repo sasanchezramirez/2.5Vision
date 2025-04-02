@@ -46,5 +46,30 @@ class ImageProcessingUtils:
         """
         pass
     
+    @staticmethod
+    def color_mapping(image: Image) -> Image:
+        """
+        Mapea los colores de la imagen para que los detalles sean más claros.
+        
+        Args:
+            image: Imagen a mapear
+            
+        Returns:
+            Image: Imagen con colores mapeados
+        """
+        pass
+
+    @staticmethod
+    def get_image_metadata(image: Image) -> dict:
+        """
+        Obtiene los metadatos de la imagen.
+
+        Args:
+            image: Imagen a obtener los metadatos
+
+        Returns:
+            dict: Metadatos de la imagen    
+        """
+        pass
     
 

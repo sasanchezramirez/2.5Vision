@@ -8,6 +8,7 @@ from app.domain.usecase.auth_usecase import AuthUseCase
 from app.domain.usecase.image_usecase import ImageUseCase
 from app.infrastructure.driven_adapter.persistence.service.persistence import Persistence
 from app.infrastructure.driven_adapter.persistence.config.database import SessionLocal
+from app.domain.gateway.siata_gateway import SiataGateway
 
 
 class Container(containers.DeclarativeContainer):
@@ -33,6 +34,11 @@ class Container(containers.DeclarativeContainer):
         session=session
     )
 
+    # Gateway de Siata
+    siata_gateway: Final = providers.Factory(
+        SiataGateway
+    )
+
     # Casos de uso
     user_usecase: Final = providers.Factory(
         UserUseCase,
@@ -46,6 +52,7 @@ class Container(containers.DeclarativeContainer):
 
     # Caso de uso para imágenes
     image_usecase: Final = providers.Factory(
-        ImageUseCase
+        ImageUseCase,
+        siata_gateway=siata_gateway
     )
 

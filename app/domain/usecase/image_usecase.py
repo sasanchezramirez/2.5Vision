@@ -2,26 +2,39 @@ import logging
 from typing import Final
 from fastapi import UploadFile
 from PIL import Image
+import piexif
 
 from app.domain.usecase.util.image_processing_utils import ImageProcessingUtils
-
+from app.domain.usecase.util.roi_utils import ROIUtils
+from app.domain.usecase.util.statistical_utils import StatisticalUtils
+from app.domain.usecase.util.geolocalization_utils import GeolocalizationUtils
+from app.domain.gateway.siata_gateway import SiataGateway
+from app.domain.model.gps import GPS
+from app.domain.model.pm_estimation import PMEstimation
 logger: Final[logging.Logger] = logging.getLogger("Image UseCase")
 
 class ImageUseCase:
-    def __init__(self):
-        pass
+    def __init__(self, siata_gateway: SiataGateway):
+        self.siata_gateway = siata_gateway
 
-    async def execute(self, file: UploadFile) -> dict:
+    async def execute(self, file: UploadFile) -> PMEstimation:
         """
-        Pipelin de procesamiento de imagen para detectar la cantidad de material particulado presente.
+        Pipeline de procesamiento de imagen para detectar la cantidad de material particulado presente.
         
         Args:
-            file: Archivo de imagen a subir
+            file: Archivo de imagen a subir 
             
         Returns:
-            dict: Estado del proceso
+            PMEstimation: Estimación de la cantidad de material particulado presente
         """
         normalized_image = self._image_normalization(file)
+        gps_data = self._get_gps_data(file)
+        roi_image = ROIUtils.get_roi(normalized_image)
+        feature_vector = self._image_processing(roi_image)
+        pm_data = self.get_pm_data(gps_data)
+        pm_estimation = self.get_pm_estimation(pm_data, feature_vector)
+        pm_qualitative_estimation = self.get_pm_qualitative_estimation(pm_estimation)
+        return PMEstimation(pm_estimation=pm_estimation[0], pm_estimation_confidence=pm_estimation[1], pm_qualitative_estimation=pm_qualitative_estimation)
 
     def _image_normalization(self, image: Image) -> Image:
         """
@@ -41,3 +54,85 @@ class ImageUseCase:
         noise_reduced_image = ImageProcessingUtils.noise_reduction(white_balanced_image)
         return noise_reduced_image
     
+    def _image_processing(self, image: Image) -> list[float]:
+        """
+        Procesa la imagen para detectar la cantidad de material particulado presente.
+        - Mapea los colores de la imagen
+        - Obtiene los píxeles de la imagen
+        - Obtiene la mediana y la media de los píxeles
+        - Devuelve un vector de características
+
+        Args:
+            image: Imagen a procesar
+            
+        Returns:
+            list[float]: Vector de características
+        """
+        color_mapping_image = ImageProcessingUtils.color_mapping(image)
+        pixel_values = ROIUtils.get_pixels(color_mapping_image)
+        median = StatisticalUtils.get_median(pixel_values)
+        mean = StatisticalUtils.get_mean(pixel_values)
+        feature_vector = [median, mean]
+        return feature_vector
+
+    def _get_gps_data(self, image: Image) -> GPS:
+        """
+        Obtiene los datos de la imagen.
+        - Obtiene los datos de la imagen
+        - Obtiene la latitud y la longitud de la imagen
+        - Obtiene la zona geográfica de la imagen
+
+        Args:
+            image: Imagen a verificar
+
+        Returns:
+            GPS: Datos de la imagen
+        """
+        image_metadata = ImageProcessingUtils.get_image_metadata(image)
+        gps = image_metadata["GPS"]
+        if not gps:
+            return GPS(latitude=None, longitude=None, zone=0)
+        gps_latitude = gps["latitude"]
+        gps_latitude_ref = gps.get(piexif.GPSIFD.GPSLatitudeRef).decode()
+        gps_longitude = gps["longitude"]
+        gps_longitude_ref = gps.get(piexif.GPSIFD.GPSLongitudeRef).decode()
+        latitude = GeolocalizationUtils.dms_to_decimal(gps_latitude, gps_latitude_ref)
+        longitude = GeolocalizationUtils.dms_to_decimal(gps_longitude, gps_longitude_ref)
+        return GPS(latitude=latitude, longitude=longitude, zone=0)
+    
+    def get_pm_data(self, gps_data: GPS) -> list[float]:
+        """
+        Obtiene los datos de la imagen.   
+
+        Args:
+            image: Imagen a verificar
+
+        Returns:
+            list[float]: Datos del material particulado de la zona
+        """
+        pass
+
+    def get_pm_estimation(self, pm_data: list[float], feature_vector: list[float]) -> list[float]:
+        """
+        Obtiene la estimación de la cantidad de material particulado presente.
+
+        Args:
+            pm_data: Datos del material particulado de la zona
+            feature_vector: Vector de características
+
+        Returns:
+            list[float]: Estimación de la cantidad de material particulado presente y confianza de la estimación.
+        """
+        pass
+
+    def get_pm_qualitative_estimation(self, pm_estimation: float) -> str:
+        """
+        Obtiene la estimación cualitativa de la cantidad de material particulado presente.
+
+        Args:
+            pm_estimation: Estimación de la cantidad de material particulado presente
+
+        Returns:
+            str: Estimación cualitativa de la cantidad de material particulado presente
+        """
+        pass
