@@ -20,7 +20,13 @@ class ImageUseCase:
     async def execute(self, file: UploadFile) -> PMEstimation:
         """
         Pipeline de procesamiento de imagen para detectar la cantidad de material particulado presente.
-        
+        - Normaliza la imagen
+        - Obtiene los datos de la imagen
+        - Obtiene la zona geográfica de la imagen
+        - Obtiene los datos del material particulado de la zona
+        - Obtiene la estimación de la cantidad de material particulado presente
+        - Obtiene la estimación cualitativa de la cantidad de material particulado presente
+
         Args:
             file: Archivo de imagen a subir 
             
