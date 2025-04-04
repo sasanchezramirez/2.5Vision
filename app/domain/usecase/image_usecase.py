@@ -9,22 +9,24 @@ from app.domain.usecase.util.roi_utils import ROIUtils
 from app.domain.usecase.util.statistical_utils import StatisticalUtils
 from app.domain.usecase.util.geolocalization_utils import GeolocalizationUtils
 from app.domain.gateway.siata_gateway import SiataGateway
+from app.domain.gateway.purpleair_gateway import PurpleAirGateway
 from app.domain.model.gps import GPS
 from app.domain.model.pm_estimation import PMEstimation
 from app.domain.model.zones import ZoneDictionary
 logger: Final[logging.Logger] = logging.getLogger("Image UseCase")
 
 class ImageUseCase:
-    def __init__(self, siata_gateway: SiataGateway):
+    def __init__(self, siata_gateway: SiataGateway, purpleair_gateway: PurpleAirGateway):
         self.siata_gateway = siata_gateway
         self.zone_dictionary = ZoneDictionary()
+        self.purpleair_gateway = purpleair_gateway
 
     async def execute(self, file: UploadFile) -> PMEstimation:
         """
         Pipeline de procesamiento de imagen para detectar la cantidad de material particulado presente.
         - Normaliza la imagen
         - Obtiene los datos de la imagen
-        - Obtiene la zona geográfica de la imagen
+        - Obtiene la zona geográfica de la imagen~
         - Obtiene los datos del material particulado de la zona
         - Obtiene la estimación de la cantidad de material particulado presente
         - Obtiene la estimación cualitativa de la cantidad de material particulado presente
@@ -39,7 +41,8 @@ class ImageUseCase:
         gps_data = self._get_gps_data(file)
         roi_image = ROIUtils.get_roi(normalized_image)
         feature_vector = self._image_processing(roi_image)
-        pm_data = self._get_pm_data(gps_data)
+        if gps_data.zone and gps_data.zone != 0:
+            pm_data = self._get_pm_data(gps_data)
         pm_estimation = self._get_pm_estimation(pm_data, feature_vector)
         pm_qualitative_estimation = self._get_pm_qualitative_estimation(pm_estimation)
         return PMEstimation(pm_estimation=pm_estimation[0], pm_estimation_confidence=pm_estimation[1], pm_qualitative_estimation=pm_qualitative_estimation)
@@ -121,7 +124,9 @@ class ImageUseCase:
         Returns:
             list[float]: Datos del material particulado de la zona
         """
-        pass
+        siata_pm_data = self.siata_gateway.get_data_by_zone(gps_data.zone)
+        purpleair_pm_data = self.purpleair_gateway.get_data_by_zone(gps_data.zone)
+
 
     def _get_pm_estimation(self, pm_data: list[float], feature_vector: list[float]) -> list[float]:
         """
