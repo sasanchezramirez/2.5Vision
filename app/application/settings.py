@@ -73,6 +73,17 @@ class Settings(BaseSettings):
         description="Tiempo de expiración de tokens JWT en minutos"
     )
 
+    PURPLEAIR_API_KEY: str = Field(
+        default="",
+        env="PURPLEAIR_API_KEY",
+        description="Clave secreta para la API de PurpleAir"
+    )
+    PURPLEAIR_BASE_URL: str = Field(
+        default="https://api.purpleair.com/v1",
+        env="PURPLEAIR_BASE_URL",
+        description="URL base de la API de PurpleAir"
+    )
+
     class Config:
         """
         Configuración de Pydantic.
