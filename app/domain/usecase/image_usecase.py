@@ -10,6 +10,7 @@ from app.domain.usecase.util.statistical_utils import StatisticalUtils
 from app.domain.usecase.util.geolocalization_utils import GeolocalizationUtils
 from app.domain.gateway.siata_gateway import SiataGateway
 from app.domain.gateway.purpleair_gateway import PurpleAirGateway
+from app.domain.gateway.estimation_ml_model_gateway import EstimationMLModelGateway
 from app.domain.model.gps import GPS
 from app.domain.model.pm_estimation import PMEstimation
 from app.domain.model.zones import ZoneDictionary
@@ -17,10 +18,11 @@ from app.domain.model.data_sensors import DataSensor
 logger: Final[logging.Logger] = logging.getLogger("Image UseCase")
 
 class ImageUseCase:
-    def __init__(self, siata_gateway: SiataGateway, purpleair_gateway: PurpleAirGateway):
+    def __init__(self, siata_gateway: SiataGateway, purpleair_gateway: PurpleAirGateway, estimation_ml_model_gateway: EstimationMLModelGateway):
         self.siata_gateway = siata_gateway
         self.zone_dictionary = ZoneDictionary()
         self.purpleair_gateway = purpleair_gateway
+        self.estimation_ml_model_gateway = estimation_ml_model_gateway
 
     async def execute(self, file: UploadFile) -> PMEstimation:
         """
@@ -141,7 +143,8 @@ class ImageUseCase:
         Returns:
             PMEstimation: Estimación de la cantidad de material particulado presente y confianza de la estimación.
         """
-        pass
+        pm_estimation = self.estimation_ml_model_gateway.estimate_pm(pm_data, feature_vector)
+        return pm_estimation
 
     def _get_pm_qualitative_estimation(self, pm_estimation: PMEstimation) -> PMEstimation:
         """

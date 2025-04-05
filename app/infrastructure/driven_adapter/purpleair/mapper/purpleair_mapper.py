@@ -1,4 +1,4 @@
-from app.domain.model.purple_air_data_sensors import NetworkDataSensor
+from app.domain.model.data_sensors import NetworkDataSensor
 from app.infrastructure.driven_adapter.purpleair.dto.sensor_data_response_dto import SensorDataResponseDto
 
 class PurpleAirMapper:

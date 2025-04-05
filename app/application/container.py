@@ -10,7 +10,7 @@ from app.infrastructure.driven_adapter.persistence.service.persistence import Pe
 from app.infrastructure.driven_adapter.persistence.config.database import SessionLocal
 from app.domain.gateway.siata_gateway import SiataGateway
 from app.domain.gateway.purpleair_gateway import PurpleAirGateway
-
+from app.domain.gateway.estimation_ml_model_gateway import EstimationMLModelGateway
 class Container(containers.DeclarativeContainer):
     """
     Contenedor de inyección de dependencias.
@@ -44,6 +44,11 @@ class Container(containers.DeclarativeContainer):
         PurpleAirGateway
     )
 
+    # Gateway de Estimación ML Model
+    estimation_ml_model_gateway: Final = providers.Factory(
+        EstimationMLModelGateway
+    )
+
     # Casos de uso
     user_usecase: Final = providers.Factory(
         UserUseCase,
@@ -59,6 +64,7 @@ class Container(containers.DeclarativeContainer):
     image_usecase: Final = providers.Factory(
         ImageUseCase,
         siata_gateway=siata_gateway,
-        purpleair_gateway=purpleair_gateway
+        purpleair_gateway=purpleair_gateway,
+        estimation_ml_model_gateway=estimation_ml_model_gateway
     )
 

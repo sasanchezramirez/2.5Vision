@@ -5,7 +5,7 @@ from app.domain.gateway.purpleair_gateway import PurpleAirGateway
 from app.application.settings import settings
 from app.infrastructure.driven_adapter.purpleair.util.sensors_by_zone import SensorsByZoneDictionary
 from app.infrastructure.driven_adapter.purpleair.dto.sensor_data_response_dto import SensorDataResponseDto
-from app.domain.model.purple_air_data_sensors import PurpleAirDataSensors
+from app.domain.model.data_sensors import PurpleAirDataSensors
 from app.infrastructure.driven_adapter.purpleair.mapper.purpleair_mapper import PurpleAirMapper
 logger: Final[logging.Logger] = logging.getLogger("PurpleAir Service")
 
