@@ -13,6 +13,7 @@ from app.domain.gateway.purpleair_gateway import PurpleAirGateway
 from app.domain.model.gps import GPS
 from app.domain.model.pm_estimation import PMEstimation
 from app.domain.model.zones import ZoneDictionary
+from app.domain.model.data_sensors import DataSensor
 logger: Final[logging.Logger] = logging.getLogger("Image UseCase")
 
 class ImageUseCase:
@@ -43,10 +44,9 @@ class ImageUseCase:
         feature_vector = self._image_processing(roi_image)
         if gps_data.zone and gps_data.zone != 0:
             pm_data = self._get_pm_data(gps_data)
-        pm_estimation = self._get_pm_estimation(pm_data, feature_vector)
-        pm_qualitative_estimation = self._get_pm_qualitative_estimation(pm_estimation)
-        return PMEstimation(pm_estimation=pm_estimation[0], pm_estimation_confidence=pm_estimation[1], pm_qualitative_estimation=pm_qualitative_estimation)
-
+        pm_quantitative_estimation = self._get_pm_quantitative_estimation(pm_data, feature_vector)
+        pm_estimation = self._get_pm_qualitative_estimation(pm_quantitative_estimation)
+        return pm_estimation
     def _image_normalization(self, image: Image) -> Image:
         """
         Normaliza la imagen como preprocesamiento para el modelo de detección de material particulado.
@@ -114,7 +114,7 @@ class ImageUseCase:
         
         return GPS(latitude=latitude, longitude=longitude, zone=zone)
     
-    def _get_pm_data(self, gps_data: GPS) -> list[float]:
+    def _get_pm_data(self, gps_data: GPS) -> list[DataSensor]:
         """
         Obtiene los datos de material particulado de la zona estipulada usando la información de SIATA.   
 
@@ -126,9 +126,11 @@ class ImageUseCase:
         """
         siata_pm_data = self.siata_gateway.get_data_by_zone(gps_data.zone)
         purpleair_pm_data = self.purpleair_gateway.get_data_by_zone(gps_data.zone)
+        list_pm_data = [siata_pm_data, purpleair_pm_data]
+        return list_pm_data
 
 
-    def _get_pm_estimation(self, pm_data: list[float], feature_vector: list[float]) -> list[float]:
+    def _get_pm_quantitative_estimation(self, pm_data: list[DataSensor], feature_vector: list[float]) -> PMEstimation:
         """
         Obtiene la estimación de la cantidad de material particulado presente.
 
@@ -137,11 +139,11 @@ class ImageUseCase:
             feature_vector: Vector de características
 
         Returns:
-            list[float]: Estimación de la cantidad de material particulado presente y confianza de la estimación.
+            PMEstimation: Estimación de la cantidad de material particulado presente y confianza de la estimación.
         """
         pass
 
-    def _get_pm_qualitative_estimation(self, pm_estimation: float) -> str:
+    def _get_pm_qualitative_estimation(self, pm_estimation: PMEstimation) -> PMEstimation:
         """
         Obtiene la estimación cualitativa de la cantidad de material particulado presente.
 
@@ -149,6 +151,6 @@ class ImageUseCase:
             pm_estimation: Estimación de la cantidad de material particulado presente
 
         Returns:
-            str: Estimación cualitativa de la cantidad de material particulado presente
+            PMEstimation: Estimación cualitativa de la cantidad de material particulado presente
         """
         pass

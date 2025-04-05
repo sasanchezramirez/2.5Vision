@@ -1,10 +1,10 @@
-from app.domain.model.purple_air_data_sensors import DataSensor
+from app.domain.model.purple_air_data_sensors import NetworkDataSensor
 from app.infrastructure.driven_adapter.purpleair.dto.sensor_data_response_dto import SensorDataResponseDto
 
 class PurpleAirMapper:
     @staticmethod
-    def map_sensor_data_response_dto_to_data_sensor(sensor_data_response_dto: SensorDataResponseDto) -> DataSensor:
-        return DataSensor(
+    def map_sensor_data_response_dto_to_data_sensor(sensor_data_response_dto: SensorDataResponseDto) -> NetworkDataSensor:
+        return NetworkDataSensor(
             sensor_index=sensor_data_response_dto.sensor.sensor_index,
             name=sensor_data_response_dto.sensor.name,
             latitude=sensor_data_response_dto.sensor.latitude,
@@ -15,5 +15,6 @@ class PurpleAirMapper:
             humidity=sensor_data_response_dto.sensor.humidity,
             temperature=sensor_data_response_dto.sensor.temperature,
             pressure=sensor_data_response_dto.sensor.pressure,
-            confidence=sensor_data_response_dto.sensor.confidence
+            confidence=sensor_data_response_dto.sensor.confidence,
+            network="PURPLEAIR"
         )

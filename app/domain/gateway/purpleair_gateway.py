@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from app.domain.model.data_sensors import PurpleAirDataSensors
 
 class PurpleAirGateway(ABC):
     @abstractmethod
-    def get_data_by_zone(self, zone: int) -> dict:
+    def get_data_by_zone(self, zone: int) -> PurpleAirDataSensors:
         """
         Obtiene los datos de la zona geográfica de la red de monitoreo de PurpleAir
 
@@ -11,6 +11,6 @@ class PurpleAirGateway(ABC):
             zone: Zona geográfica
 
         Returns:
-            dict: Datos de la zona geográfica
+            PurpleAirDataSensors: Datos de la zona geográfica tomados de la red de monitoreo de PurpleAir
         """
         pass
