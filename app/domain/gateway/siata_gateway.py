@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import List
+from app.domain.model.data_sensors import DataSensor
 
 class SiataGateway(ABC):
     @abstractmethod
-    def get_data_by_zone(self, zone: int) -> dict:
+    def get_data_by_zone(self, zone: int) -> List[DataSensor]:
         """
         Obtiene los datos de la zona geográfica.
 
@@ -11,6 +12,6 @@ class SiataGateway(ABC):
             zone: Zona geográfica
 
         Returns:
-            dict: Datos de la zona geográfica
+            List[DataSensor]: Datos de la zona geográfica
         """
         pass

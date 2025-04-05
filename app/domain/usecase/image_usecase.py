@@ -52,8 +52,7 @@ class ImageUseCase:
         pm_estimation = self._get_pm_qualitative_estimation(pm_quantitative_estimation)
         return pm_estimation
     
-
-    async def upload_image(self, file: UploadFile) -> bool:
+    async def upload_image(self, file: UploadFile) -> dict:
         """
         Sube una imagen a un bucket de AWS S3.  
 
@@ -61,10 +60,11 @@ class ImageUseCase:
             file: Archivo de imagen a subir
 
         Returns:
-            bool: Respuesta con el resultado de la operación
+            dict: Información sobre la imagen subida (URL, nombre, tipo, tamaño)
         """
         logger.info("Subiendo imagen a S3")
         return self.s3_gateway.upload_image(file)
+    
     def _image_normalization(self, image: Image) -> Image:
         """
         Normaliza la imagen como preprocesamiento para el modelo de detección de material particulado.

@@ -19,19 +19,20 @@ router: Final[APIRouter] = APIRouter(
     prefix='/image',
     tags=['image'],
     responses={
-        400: {"description": "Validation Error", "model": ResponseDTO},
-        500: {"description": "Internal Server Error", "model": ResponseDTO},
+        400: {"description": "Validación incorrecta", "model": ResponseDTO},
+        422: {"description": "Error de validación de entidad", "model": ResponseDTO},
+        500: {"description": "Error interno del servidor", "model": ResponseDTO},
     }
 )
 
 @router.post('/estimation', response_model=ResponseDTO)
 @inject
-async def upload_image(
+async def upload_image_for_estimation(
     file: UploadFile = File(...),
     image_usecase: ImageUseCase = Depends(Provide[Container.image_usecase])
 ) -> JSONResponse:
     """
-    Sube una imagen al sistema.
+    Sube una imagen al sistema y realiza una estimación de material particulado.
     
     Args:
         file: Archivo de imagen a subir
@@ -64,7 +65,7 @@ async def upload_image(
     except CustomException as e:
         return JSONResponse(
             status_code=e.http_status,
-            content=e.to_dict()
+            content=ApiResponse.create_error_response(e)
         )
     except Exception as e:
         logger.error(f"Excepción no manejada: {e}")
@@ -80,11 +81,14 @@ async def upload_image(
     image_usecase: ImageUseCase = Depends(Provide[Container.image_usecase])
 ) -> JSONResponse:
     """
-    Sube una imagen al sistema.
+    Sube una imagen al sistema y la almacena en S3.
     
     Args:
         file: Archivo de imagen a subir
         image_usecase: Caso de uso para operaciones con imágenes
+
+    Returns:
+        JSONResponse: Respuesta con el resultado de la operación
     """ 
     logger.info("Iniciando subida de imagen")
     try:
@@ -110,7 +114,7 @@ async def upload_image(
     except CustomException as e:
         return JSONResponse(
             status_code=e.http_status,
-            content=e.to_dict() 
+            content=ApiResponse.create_error_response(e)
         )
     except Exception as e:
         logger.error(f"Excepción no manejada: {e}")
