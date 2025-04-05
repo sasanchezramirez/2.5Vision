@@ -15,6 +15,7 @@ class UserEntity(Base):
     """
 
     __tablename__ = "users"
+    __table_args__ = {"schema": "vision_2_5"} 
 
     id: int = Column(Integer, primary_key=True, index=True, autoincrement=True)
     email: str = Column(String, unique=True, index=True, nullable=False)
