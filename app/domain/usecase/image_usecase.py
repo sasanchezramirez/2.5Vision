@@ -11,6 +11,7 @@ from app.domain.usecase.util.geolocalization_utils import GeolocalizationUtils
 from app.domain.gateway.siata_gateway import SiataGateway
 from app.domain.gateway.purpleair_gateway import PurpleAirGateway
 from app.domain.gateway.estimation_ml_model_gateway import EstimationMLModelGateway
+from app.domain.gateway.s3_gateway import S3Gateway
 from app.domain.model.gps import GPS
 from app.domain.model.pm_estimation import PMEstimation
 from app.domain.model.zones import ZoneDictionary
@@ -18,11 +19,12 @@ from app.domain.model.data_sensors import DataSensor
 logger: Final[logging.Logger] = logging.getLogger("Image UseCase")
 
 class ImageUseCase:
-    def __init__(self, siata_gateway: SiataGateway, purpleair_gateway: PurpleAirGateway, estimation_ml_model_gateway: EstimationMLModelGateway):
+    def __init__(self, siata_gateway: SiataGateway, purpleair_gateway: PurpleAirGateway, estimation_ml_model_gateway: EstimationMLModelGateway, s3_gateway: S3Gateway):
         self.siata_gateway = siata_gateway
         self.zone_dictionary = ZoneDictionary()
         self.purpleair_gateway = purpleair_gateway
         self.estimation_ml_model_gateway = estimation_ml_model_gateway
+        self.s3_gateway = s3_gateway
 
     async def data_pipeline(self, file: UploadFile) -> PMEstimation:
         """
@@ -61,8 +63,8 @@ class ImageUseCase:
         Returns:
             bool: Respuesta con el resultado de la operación
         """
-        pass
-    
+        logger.info("Subiendo imagen a S3")
+        return self.s3_gateway.upload_image(file)
     def _image_normalization(self, image: Image) -> Image:
         """
         Normaliza la imagen como preprocesamiento para el modelo de detección de material particulado.

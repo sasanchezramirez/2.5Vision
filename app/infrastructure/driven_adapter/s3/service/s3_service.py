@@ -25,7 +25,7 @@ class S3Service(S3Gateway):
         Returns:
             bool: Respuesta con el resultado de la operación    
         """
-        logger.info("Subiendo imagen a S3")
+        logger.info("Inicia conexión con S3")
         path = f"images/{file.filename}"
         try:
             self.s3.upload_fileobj(
