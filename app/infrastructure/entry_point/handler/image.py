@@ -24,7 +24,7 @@ router: Final[APIRouter] = APIRouter(
     }
 )
 
-@router.post('/upload', response_model=ResponseDTO)
+@router.post('/estimation', response_model=ResponseDTO)
 @inject
 async def upload_image(
     file: UploadFile = File(...),
@@ -40,7 +40,7 @@ async def upload_image(
     Returns:
         JSONResponse: Respuesta con el resultado de la operación
     """
-    logger.info("Iniciando subida de imagen")
+    logger.info("Iniciando estimación de material particulado")
     try:
         if not file.content_type.startswith('image/'):
             raise HTTPException(
@@ -48,7 +48,7 @@ async def upload_image(
                 detail="El archivo debe ser una imagen"
             )
         
-        image_info = await image_usecase.execute(file)
+        image_info = await image_usecase.data_pipeline(file)
         
         response_data = ImageUploadResponse(**image_info).model_dump()
         
@@ -72,3 +72,49 @@ async def upload_image(
             status_code=500,
             content=ApiResponse.create_response(ResponseCodeEnum.KOG01)
         ) 
+    
+@router.post('/upload', response_model=ResponseDTO)
+@inject
+async def upload_image(
+    file: UploadFile = File(...),
+    image_usecase: ImageUseCase = Depends(Provide[Container.image_usecase])
+) -> JSONResponse:
+    """
+    Sube una imagen al sistema.
+    
+    Args:
+        file: Archivo de imagen a subir
+        image_usecase: Caso de uso para operaciones con imágenes
+    """ 
+    logger.info("Iniciando subida de imagen")
+    try:
+        if not file.content_type.startswith('image/'):
+            raise HTTPException(
+                status_code=400,
+                detail="El archivo debe ser una imagen" 
+            )
+        
+        image_info = await image_usecase.upload_image(file)
+        
+        response_data = ImageUploadResponse(**image_info).model_dump()
+        
+        return JSONResponse(
+            status_code=200,
+            content=ApiResponse.create_response(ResponseCodeEnum.KO000, response_data)
+        )
+    except ValueError as e:
+        return JSONResponse(
+            status_code=400,
+            content=ApiResponse.create_response(ResponseCodeEnum.KOD01, str(e))
+        )
+    except CustomException as e:
+        return JSONResponse(
+            status_code=e.http_status,
+            content=e.to_dict() 
+        )
+    except Exception as e:
+        logger.error(f"Excepción no manejada: {e}")
+        return JSONResponse(
+            status_code=500,
+            content=ApiResponse.create_response(ResponseCodeEnum.KOG01)
+        )

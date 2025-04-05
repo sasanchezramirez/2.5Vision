@@ -24,7 +24,7 @@ class ImageUseCase:
         self.purpleair_gateway = purpleair_gateway
         self.estimation_ml_model_gateway = estimation_ml_model_gateway
 
-    async def execute(self, file: UploadFile) -> PMEstimation:
+    async def data_pipeline(self, file: UploadFile) -> PMEstimation:
         """
         Pipeline de procesamiento de imagen para detectar la cantidad de material particulado presente.
         - Normaliza la imagen
@@ -49,6 +49,20 @@ class ImageUseCase:
         pm_quantitative_estimation = self._get_pm_quantitative_estimation(pm_data, feature_vector)
         pm_estimation = self._get_pm_qualitative_estimation(pm_quantitative_estimation)
         return pm_estimation
+    
+
+    async def upload_image(self, file: UploadFile) -> bool:
+        """
+        Sube una imagen a un bucket de AWS S3.  
+
+        Args:
+            file: Archivo de imagen a subir
+
+        Returns:
+            bool: Respuesta con el resultado de la operación
+        """
+        pass
+    
     def _image_normalization(self, image: Image) -> Image:
         """
         Normaliza la imagen como preprocesamiento para el modelo de detección de material particulado.

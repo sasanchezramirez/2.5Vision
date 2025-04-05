@@ -72,7 +72,7 @@ class Settings(BaseSettings):
         env="ACCESS_TOKEN_EXPIRE_MINUTES",
         description="Tiempo de expiración de tokens JWT en minutos"
     )
-
+    # Configuración de PurpleAir
     PURPLEAIR_API_KEY: str = Field(
         default="",
         env="PURPLEAIR_API_KEY",
@@ -83,7 +83,38 @@ class Settings(BaseSettings):
         env="PURPLEAIR_BASE_URL",
         description="URL base de la API de PurpleAir"
     )
-
+    # Configuración de AWS
+    AWS_PWD: str = Field(
+        default="",
+        env="AWS_PWD",
+        description="Contraseña de AWS"
+    )   
+    AWS_USER: str = Field(
+        default="",
+        env="AWS_USER",
+        description="Usuario de AWS"
+    )
+    AWS_REGION: str = Field(
+        default="",
+        env="AWS_REGION",
+        description="Región de AWS"
+    )
+    AWS_S3_BUCKET: str = Field(
+        default="",
+        env="AWS_S3_BUCKET",
+        description="Bucket de AWS"
+    )   
+    AWS_ACCESS_KEY_ID: str = Field(
+        default="",
+        env="AWS_ACCESS_KEY_ID",
+        description="Clave de acceso de AWS"
+    )
+    AWS_SECRET_ACCESS_KEY: str = Field(
+        default="",
+        env="AWS_SECRET_ACCESS_KEY",
+        description="Clave secreta de AWS"
+    )
+    
     class Config:
         """
         Configuración de Pydantic.
