@@ -64,9 +64,16 @@ class ImageUseCase:
             dict: Información sobre la imagen subida (URL, nombre, tipo, tamaño)
         """
         logger.info("Subiendo imagen a S3")
+        gps_data = self._get_gps_data(file)
+        if gps_data.latitude is None or gps_data.longitude is None:
+            raise ValueError("No se pudo obtener la latitud y longitud de la imagen")
+        image_metadata.latitude = gps_data.latitude
+        image_metadata.longitude = gps_data.longitude  
         normalized_image = self._image_normalization(file)
         image_url = self.s3_gateway.upload_image(normalized_image)
         image_metadata.image_url = image_url
+
+          
         return image_metadata
     
     def _image_normalization(self, image: Image) -> Image:

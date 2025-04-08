@@ -3,7 +3,8 @@ from datetime import datetime
 from typing import Optional
 
 class ImageMetadata(BaseModel):
-    location: str
+    latitude: float
+    longitude: float
     datetime_taken: datetime
     visibility_score: int
     weather_tags: Optional[str] = None
