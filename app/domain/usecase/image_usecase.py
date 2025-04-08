@@ -12,6 +12,7 @@ from app.domain.gateway.siata_gateway import SiataGateway
 from app.domain.gateway.purpleair_gateway import PurpleAirGateway
 from app.domain.gateway.estimation_ml_model_gateway import EstimationMLModelGateway
 from app.domain.gateway.s3_gateway import S3Gateway
+from app.domain.gateway.persistence_gateway import PersistenceGateway
 from app.domain.model.gps import GPS
 from app.domain.model.pm_estimation import PMEstimation
 from app.domain.model.zones import ZoneDictionary
@@ -20,13 +21,13 @@ from app.domain.model.image_metadata import ImageMetadata
 logger: Final[logging.Logger] = logging.getLogger("Image UseCase")
 
 class ImageUseCase:
-    def __init__(self, siata_gateway: SiataGateway, purpleair_gateway: PurpleAirGateway, estimation_ml_model_gateway: EstimationMLModelGateway, s3_gateway: S3Gateway):
+    def __init__(self, siata_gateway: SiataGateway, purpleair_gateway: PurpleAirGateway, estimation_ml_model_gateway: EstimationMLModelGateway, s3_gateway: S3Gateway, persistence_gateway: PersistenceGateway):
         self.siata_gateway = siata_gateway
         self.zone_dictionary = ZoneDictionary()
         self.purpleair_gateway = purpleair_gateway
         self.estimation_ml_model_gateway = estimation_ml_model_gateway
         self.s3_gateway = s3_gateway
-
+        self.persistence_gateway = persistence_gateway
     async def data_pipeline(self, file: UploadFile) -> PMEstimation:
         """
         Pipeline de procesamiento de imagen para detectar la cantidad de material particulado presente.
@@ -72,7 +73,7 @@ class ImageUseCase:
         normalized_image = self._image_normalization(file)
         image_url = self.s3_gateway.upload_image(normalized_image)
         image_metadata.image_url = image_url
-
+        self.persistence_gateway.create_image_metadata(image_metadata)
           
         return image_metadata
     

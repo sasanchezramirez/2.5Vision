@@ -11,6 +11,9 @@ from app.domain.gateway.persistence_gateway import PersistenceGateway
 from app.domain.model.util.custom_exceptions import CustomException
 from app.domain.model.util.response_codes import ResponseCodeEnum
 import app.infrastructure.driven_adapter.persistence.mapper.user_mapper as mapper
+from app.infrastructure.driven_adapter.persistence.mapper.image_mapper import ImageMapper
+from app.domain.model.image_metadata import ImageMetadata
+from app.infrastructure.driven_adapter.persistence.repository.image_repository import ImageRepository
 
 logger: Final = logging.getLogger("Persistence")
 
@@ -36,6 +39,7 @@ class Persistence(PersistenceGateway):
         logger.info("Inicializando servicio de persistencia")
         self.session: Final[Session] = session
         self.user_repository: Final[UserRepository] = UserRepository(session)
+        self.image_repository: Final[ImageRepository] = ImageRepository(session)
 
     def create_user(self, user: User) -> User:
         """
@@ -146,3 +150,21 @@ class Persistence(PersistenceGateway):
             logger.error(f"Error al actualizar usuario: {e}")
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
+    
+    def create_image_metadata(self, image_metadata: ImageMetadata) -> ImageMetadata:
+        """
+        Crea un nuevo metadato de imagen en la base de datos.
+
+        Args:
+            image_metadata (ImageMetadata): Objeto de dominio ImageMetadata a crear.
+            
+        Returns:
+            ImageMetadata: Metadato de imagen creado.
+        """
+        try:
+            image_metadata_entity = ImageMapper.map_image_metadata_to_entity(image_metadata)
+            self.image_repository.create_image_metadata(image_metadata_entity)
+            self.session.commit()
+            return image_metadata
+        except CustomException as e:
+            self.session.rollback()

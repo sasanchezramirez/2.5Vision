@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from app.domain.model.user import User
-
+from app.domain.model.image_metadata import ImageMetadata
 
 class PersistenceGateway(ABC):
     """
@@ -76,3 +76,17 @@ class PersistenceGateway(ABC):
             CustomException: Si hay un error al actualizar el usuario
         """
         pass
+
+    @abstractmethod
+    def create_image_metadata(self, image_metadata: ImageMetadata) -> ImageMetadata:
+        """
+        Crea un nuevo metadato de imagen en la base de datos.
+
+        Args:
+            image_metadata: Metadato de imagen a crear
+
+        Returns:
+            ImageMetadata: Metadato de imagen creado
+        """
+        pass    
+    

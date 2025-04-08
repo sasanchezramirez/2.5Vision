@@ -73,6 +73,7 @@ class Container(containers.DeclarativeContainer):
         siata_gateway=siata_gateway,
         purpleair_gateway=purpleair_gateway,
         estimation_ml_model_gateway=estimation_ml_model_gateway,
-        s3_gateway=s3_gateway
+        s3_gateway=s3_gateway,
+        persistence_gateway=persistence_gateway
     )
 
