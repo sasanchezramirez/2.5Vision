@@ -16,6 +16,7 @@ from app.domain.model.gps import GPS
 from app.domain.model.pm_estimation import PMEstimation
 from app.domain.model.zones import ZoneDictionary
 from app.domain.model.data_sensors import DataSensor
+from app.domain.model.image_metadata import ImageMetadata
 logger: Final[logging.Logger] = logging.getLogger("Image UseCase")
 
 class ImageUseCase:
@@ -52,18 +53,21 @@ class ImageUseCase:
         pm_estimation = self._get_pm_qualitative_estimation(pm_quantitative_estimation)
         return pm_estimation
     
-    async def upload_image(self, file: UploadFile) -> dict:
+    async def upload_image(self, file: UploadFile, image_metadata: ImageMetadata) -> dict:
         """
         Sube una imagen a un bucket de AWS S3.  
 
         Args:
             file: Archivo de imagen a subir
-
+            image_metadata: Metadatos de la imagen
         Returns:
             dict: Información sobre la imagen subida (URL, nombre, tipo, tamaño)
         """
         logger.info("Subiendo imagen a S3")
-        return self.s3_gateway.upload_image(file)
+        normalized_image = self._image_normalization(file)
+        image_url = self.s3_gateway.upload_image(normalized_image)
+        image_metadata.image_url = image_url
+        return image_metadata
     
     def _image_normalization(self, image: Image) -> Image:
         """
