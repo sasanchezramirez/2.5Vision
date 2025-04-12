@@ -104,21 +104,35 @@ async def upload_image(
     logger.info("Iniciando subida de imagen")
     try:
         if not file.content_type.startswith('image/'):
+            logger.error(f"Tipo de archivo no válido: {file.content_type}")
             raise HTTPException(
                 status_code=400,
                 detail="El archivo debe ser una imagen" 
             )
         
+        logger.info(f"Mapeando metadata de imagen: datetime={datetime_taken}, visibility={visibility_score}")
         image_metadata = ImageMapper.map_upload_image_request_to_image_metadata(datetime_taken, visibility_score, weather_tags, uploader_username)
+        logger.info(f"Metadata mapeada: {image_metadata}")
 
+        logger.info("Iniciando subida de imagen al UseCase")
         image_info = await image_usecase.upload_image(file, image_metadata)
-        image_response = ImageMapper.map_upload_image_response_to_image_metadata(image_info)
+        logger.info(f"Imagen subida, info recibida: {image_info}")
         
+        logger.info("Mapeando respuesta")
+        image_response = ImageMapper.map_upload_image_response_to_image_metadata(image_info)
+        logger.info(f"Respuesta mapeada: {image_response}")
+        
+        logger.info("Generando diccionario de respuesta")
         response_dict = image_response.model_dump()
+        logger.info(f"Diccionario generado: {response_dict}")
+        
+        logger.info("Creando respuesta JSON")
+        response_content = ApiResponse.create_response(ResponseCodeEnum.KO000, response_dict)
+        logger.info(f"Contenido de respuesta creado: {response_content}")
         
         return JSONResponse(
             status_code=200,
-            content=ApiResponse.create_response(ResponseCodeEnum.KO000, response_dict)
+            content=response_content
         )
     except ValueError as e:
         return JSONResponse(

@@ -136,15 +136,22 @@ class ImageUseCase:
             ImageConfigMetadata: Metadatos de la imagen
         """
         image_metadata = ImageProcessingUtils.get_image_metadata(image)
+        datetime_original = image_metadata.get("DateTimeOriginal")
+        if datetime_original and isinstance(datetime_original, str):
+            parts = datetime_original.split(" ")
+            if len(parts) == 2:
+                date_part = parts[0].replace(":", "-")
+                time_part = parts[1]
+                datetime_original = f"{date_part} {time_part}"     
         image_config_metadata = ImageConfigMetadata(
-            camera_make= image_metadata.get("CameraMake") if image_metadata.get("CameraMake") else None,
-            camera_model=image_metadata.get("CameraModel") if image_metadata.get("CameraModel") else None,
-            iso=image_metadata.get("ISO") if image_metadata.get("ISO") else None,
-            shutter_speed=image_metadata.get("ShutterSpeed") if image_metadata.get("ShutterSpeed") else None,
-            aperture=image_metadata.get("Aperture") if image_metadata.get("Aperture") else None,
-            exposure_compensation=image_metadata.get("ExposureCompensation") if image_metadata.get("ExposureCompensation") else None,
+            camera_make= image_metadata.get("Make") if image_metadata.get("Make") else None,
+            camera_model=image_metadata.get("Model") if image_metadata.get("Model") else None,
+            iso=image_metadata.get("ISOSpeedRatings") if image_metadata.get("ISOSpeedRatings") else None,
+            shutter_speed=image_metadata.get("ExposureTime") if image_metadata.get("ExposureTime") else None,
+            aperture=image_metadata.get("FNumber") if image_metadata.get("FNumber") else None,
+            exposure_compensation=image_metadata.get("ExposureBiasValue") if image_metadata.get("ExposureBiasValue") else None,
             focal_length=image_metadata.get("FocalLength") if image_metadata.get("FocalLength") else None,
-            datetime_original=image_metadata.get("DateTimeOriginal") if image_metadata.get("DateTimeOriginal") else None
+            datetime_original=datetime_original
         )
         return image_config_metadata
         

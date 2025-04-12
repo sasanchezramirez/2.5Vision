@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Union
 from datetime import datetime
 
 class ImageConfigMetadata(BaseModel):
@@ -31,7 +31,7 @@ class ImageConfigMetadata(BaseModel):
         None,
         description="Longitud focal en milímetros (mm)."
     )
-    datetime_original: Optional[datetime] = Field(
+    datetime_original: Optional[Union[datetime, str]] = Field(
         None,
-        description="Fecha y hora originales en que se tomó la foto."
+        description="Fecha y hora originales en que se tomó la foto. Puede ser un objeto datetime o una cadena en formato 'YYYY-MM-DD HH:MM:SS'."
     )
