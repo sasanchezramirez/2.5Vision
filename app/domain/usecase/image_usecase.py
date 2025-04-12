@@ -67,12 +67,17 @@ class ImageUseCase:
         logger.info("Inicia el flujo de carga de imágenes")
         image_pilow = await ImageProcessingUtils.format_upload_file_to_image(file)
         gps_data = self._get_gps_data(image_pilow)
-        if gps_data.latitude is None or gps_data.longitude is None:
-            raise ValueError("No se pudo obtener la latitud y longitud de la imagen")
-        image_metadata.latitude = gps_data.latitude
-        image_metadata.longitude = gps_data.longitude  
+        if gps_data.latitude or gps_data.longitude: 
+            has_metadata = True
+            image_metadata.latitude = gps_data.latitude
+            image_metadata.longitude = gps_data.longitude
+        else:
+            has_metadata = False
+            image_metadata.latitude = None
+            image_metadata.longitude = None
+       
         #normalized_image = self._image_normalization(file)
-        file_details = self.s3_gateway.upload_image(file)
+        file_details = self.s3_gateway.upload_image(file, has_metadata)
         image_metadata.image_url = file_details.image_url
         image_metadata.image_name = file_details.image_name
         self.persistence_gateway.create_image_metadata(image_metadata)
@@ -134,9 +139,10 @@ class ImageUseCase:
         logger.info("Inicia el flujo de obtención de datos de la imagen")
         image_metadata = ImageProcessingUtils.get_image_metadata(image)
         logger.info(f"Metadatos de la imagen obtenidos: {image_metadata}")
-        gps = image_metadata["GPSInfo"]
-        if not gps:
-            return GPS(latitude=None, longitude=None, zone=0)
+        try:
+            gps = image_metadata["GPSInfo"]
+        except KeyError:
+                return GPS(latitude=None, longitude=None, zone=0)
         gps_latitude = gps["GPSLatitude"]
         gps_latitude_ref = gps["GPSLatitudeRef"]
         gps_longitude = gps["GPSLongitude"]

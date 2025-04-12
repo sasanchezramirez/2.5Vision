@@ -18,17 +18,20 @@ class S3Service(S3Gateway):
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
             region_name=settings.AWS_REGION)   
     
-    def upload_image(self, file: UploadFile) -> UploadImageResponse:
+    def upload_image(self, file: UploadFile, has_metadata: bool) -> UploadImageResponse:
         """
         Sube una imagen a un bucket de AWS S3.
         Args:
             file: Archivo de imagen a subir
-
+            has_metadata: Indica si la imagen tiene metadatos
         Returns:
             UploadImageResponse: Respuesta con la URL de la imagen subida y algunos datos de la imagen
         """
         logger.info("Inicia conexión con S3")
-        path = f"images/{file.filename}"
+        if has_metadata:
+            path = f"images/with_metadata/{file.filename}"
+        else:
+            path = f"images/no_metadata/{file.filename}"
         
         try:
             # Guardar temporalmente el contenido del archivo para obtener su tamaño

@@ -4,8 +4,8 @@ class ImageMapper:
     @staticmethod
     def map_image_metadata_to_entity(image_metadata: ImageMetadata) -> ImageMetadataEntity:
         return ImageMetadataEntity(
-            latitude=image_metadata.latitude,
-            longitude=image_metadata.longitude,
+            latitude=image_metadata.latitude if image_metadata.latitude else None,
+            longitude=image_metadata.longitude if image_metadata.longitude else None,
             datetime_taken=image_metadata.datetime_taken,
             visibility_score=image_metadata.visibility_score,
             weather_tags=image_metadata.weather_tags,

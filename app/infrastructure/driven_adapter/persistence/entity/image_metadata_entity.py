@@ -17,8 +17,8 @@ class ImageMetadataEntity(Base):
     __table_args__ = {"schema": "vision_2_5"} 
 
     id: int = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    latitude: float = Column(Float, nullable=False)
-    longitude: float = Column(Float, nullable=False)
+    latitude: float = Column(Float, nullable=True)
+    longitude: float = Column(Float, nullable=True)
     datetime_taken: datetime = Column(DateTime, nullable=False)
     visibility_score: int = Column(Integer, nullable=False)
     weather_tags: Optional[str] = Column(String, nullable=True)
