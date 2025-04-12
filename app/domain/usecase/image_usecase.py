@@ -72,10 +72,11 @@ class ImageUseCase:
         image_metadata.latitude = gps_data.latitude
         image_metadata.longitude = gps_data.longitude  
         #normalized_image = self._image_normalization(file)
-        image_url = self.s3_gateway.upload_image(file).image_url
-        image_metadata.image_url = image_url
+        file_details = self.s3_gateway.upload_image(file)
+        image_metadata.image_url = file_details.image_url
+        image_metadata.image_name = file_details.image_name
         self.persistence_gateway.create_image_metadata(image_metadata)
-        logger.info(f"Imagen subida a S3: {image_url}")
+        logger.info(f"Imagen subida a S3: {image_metadata.image_url}")
         return image_metadata
     
     def _image_normalization(self, image: Image) -> Image:

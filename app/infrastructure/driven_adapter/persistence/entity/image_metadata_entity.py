@@ -24,8 +24,9 @@ class ImageMetadataEntity(Base):
     weather_tags: Optional[str] = Column(String, nullable=True)
     uploader_username: Optional[str] = Column(String, nullable=True)
     image_url: str = Column(String, nullable=False)
+    image_name: str = Column(String, nullable=False)
 
-    def __init__(self, latitude: float, longitude: float, datetime_taken: datetime, visibility_score: int, weather_tags: Optional[str] = None, uploader_username: Optional[str] = None, image_url: str = "") -> None:
+    def __init__(self, latitude: float, longitude: float, datetime_taken: datetime, visibility_score: int, weather_tags: Optional[str] = None, uploader_username: Optional[str] = None, image_url: str = "", image_name: str = "") -> None:
         self.latitude = latitude
         self.longitude = longitude
         self.datetime_taken = datetime_taken
@@ -33,6 +34,7 @@ class ImageMetadataEntity(Base):
         self.weather_tags = weather_tags
         self.uploader_username = uploader_username
         self.image_url = image_url
+        self.image_name = image_name    
 
     def __repr__(self) -> str:
-        return f"<ImageMetadataEntity(id={self.id}, latitude={self.latitude}, longitude={self.longitude}, datetime_taken={self.datetime_taken}, visibility_score={self.visibility_score}, weather_tags={self.weather_tags}, uploader_username={self.uploader_username}, image_url={self.image_url})>"
+        return f"<ImageMetadataEntity(id={self.id}, latitude={self.latitude}, longitude={self.longitude}, datetime_taken={self.datetime_taken}, visibility_score={self.visibility_score}, weather_tags={self.weather_tags}, uploader_username={self.uploader_username}, image_url={self.image_url}, image_name={self.image_name})>"

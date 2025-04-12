@@ -10,3 +10,4 @@ class ImageMetadata(BaseModel):
     weather_tags: Optional[str] = None
     uploader_username: Optional[str] = None
     image_url: Optional[str] = None
+    image_name: Optional[str] = None

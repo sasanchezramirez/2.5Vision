@@ -10,5 +10,6 @@ class ImageMapper:
             visibility_score=image_metadata.visibility_score,
             weather_tags=image_metadata.weather_tags,
             uploader_username=image_metadata.uploader_username,
-            image_url=image_metadata.image_url
+            image_url=image_metadata.image_url,
+            image_name=image_metadata.image_name
         )       
