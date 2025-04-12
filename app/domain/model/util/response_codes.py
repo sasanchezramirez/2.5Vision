@@ -18,6 +18,8 @@ class ResponseCodeEnum(Enum):
     KOG02 = (500, "A database error occurred")
     KOG01 = (500, "Internal Server Error")
 
+    VIM01 = (400, "Invalid image metadata")
+
     KO000 = (200, "Operation successful")
 
     def __init__(self, http_status, message):

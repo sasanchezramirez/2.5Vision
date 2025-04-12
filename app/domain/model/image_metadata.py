@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional
 
 class ImageMetadata(BaseModel):
-    latitude: float
-    longitude: float
+    latitude: Optional[float] = Field(default=None, description="Latitud de la imagen")
+    longitude: Optional[float] = Field(default=None, description="Longitud de la imagen")
     datetime_taken: datetime
     visibility_score: int
     weather_tags: Optional[str] = None

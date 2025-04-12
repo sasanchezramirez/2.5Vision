@@ -64,8 +64,9 @@ class ImageUseCase:
         Returns:
             dict: Información sobre la imagen subida (URL, nombre, tipo, tamaño)
         """
-        logger.info("Subiendo imagen a S3")
-        gps_data = self._get_gps_data(file)
+        logger.info("Inicia el flujo de carga de imágenes")
+        image_pilow = await ImageProcessingUtils.format_upload_file_to_image(file)
+        gps_data = self._get_gps_data(image_pilow)
         if gps_data.latitude is None or gps_data.longitude is None:
             raise ValueError("No se pudo obtener la latitud y longitud de la imagen")
         image_metadata.latitude = gps_data.latitude
@@ -74,7 +75,7 @@ class ImageUseCase:
         image_url = self.s3_gateway.upload_image(normalized_image)
         image_metadata.image_url = image_url
         self.persistence_gateway.create_image_metadata(image_metadata)
-          
+        logger.info(f"Imagen subida a S3: {image_url}")
         return image_metadata
     
     def _image_normalization(self, image: Image) -> Image:
@@ -129,19 +130,21 @@ class ImageUseCase:
         Returns:
             GPS: Datos de la imagen
         """
+        logger.info("Inicia el flujo de obtención de datos de la imagen")
         image_metadata = ImageProcessingUtils.get_image_metadata(image)
-        gps = image_metadata["GPS"]
+        logger.info(f"Metadatos de la imagen obtenidos: {image_metadata}")
+        gps = image_metadata["GPSInfo"]
         if not gps:
             return GPS(latitude=None, longitude=None, zone=0)
-        gps_latitude = gps["latitude"]
-        gps_latitude_ref = gps.get(piexif.GPSIFD.GPSLatitudeRef).decode()
-        gps_longitude = gps["longitude"]
-        gps_longitude_ref = gps.get(piexif.GPSIFD.GPSLongitudeRef).decode()
+        gps_latitude = gps["GPSLatitude"]
+        gps_latitude_ref = gps["GPSLatitudeRef"]
+        gps_longitude = gps["GPSLongitude"]
+        gps_longitude_ref = gps["GPSLongitudeRef"]
         latitude = GeolocalizationUtils.dms_to_decimal(gps_latitude, gps_latitude_ref)
         longitude = GeolocalizationUtils.dms_to_decimal(gps_longitude, gps_longitude_ref)        
         gps_obj = GPS(latitude=latitude, longitude=longitude, zone=0)
         zone = self.zone_dictionary.get_zone(gps_obj)
-        
+        logger.info(f"Zona geográfica obtenida: {zone}, para la latitud: {latitude} y la longitud: {longitude}")
         return GPS(latitude=latitude, longitude=longitude, zone=zone)
     
     def _get_pm_data(self, gps_data: GPS) -> list[DataSensor]:

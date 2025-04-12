@@ -81,7 +81,6 @@ async def upload_image_for_estimation(
 @inject
 async def upload_image(
     file: UploadFile = File(...),
-    location: str = Form(...),
     datetime_taken: datetime = Form(...),
     visibility_score: int = Form(...),
     weather_tags: Optional[str] = Form(None),
@@ -94,6 +93,10 @@ async def upload_image(
     Args:
         file: Archivo de imagen a subir
         image_usecase: Caso de uso para operaciones con imágenes
+        datetime_taken: Fecha y hora de la imagen
+        visibility_score: Puntaje de visibilidad de la imagen
+        weather_tags: Etiquetas del tiempo de la imagen
+        uploader_username: Nombre del usuario que sube la imagen
 
     Returns:
         JSONResponse: Respuesta con el resultado de la operación
@@ -106,7 +109,7 @@ async def upload_image(
                 detail="El archivo debe ser una imagen" 
             )
         
-        image_metadata = ImageMapper.map_upload_image_request_to_image_metadata(location, datetime_taken, visibility_score, weather_tags, uploader_username)
+        image_metadata = ImageMapper.map_upload_image_request_to_image_metadata(datetime_taken, visibility_score, weather_tags, uploader_username)
 
         image_info = await image_usecase.upload_image(file, image_metadata)
         
