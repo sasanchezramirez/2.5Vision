@@ -3,6 +3,9 @@ from typing import Final
 from fastapi import UploadFile
 from PIL import Image
 import piexif
+import io
+from PIL import ImageEnhance
+from PIL import ImageStat
 
 from app.domain.usecase.util.image_processing_utils import ImageProcessingUtils
 from app.domain.usecase.util.roi_utils import ROIUtils
@@ -78,7 +81,7 @@ class ImageUseCase:
             image_metadata.latitude = None
             image_metadata.longitude = None
         image_config_metadata = self._get_image_configuration_metadata(image_pilow)
-        #normalized_image = self._image_normalization(file, image_config_metadata)
+        normalized_image = self._image_normalization(file, image_config_metadata)
         file_details = self.s3_gateway.upload_image(file, has_metadata)
         image_metadata.image_url = file_details.image_url
         image_metadata.image_name = file_details.image_name
@@ -86,7 +89,7 @@ class ImageUseCase:
         logger.info(f"Imagen subida a S3: {image_metadata.image_url}")
         return image_metadata
     
-    def _image_normalization(self, image: Image, image_config_metadata: ImageConfigMetadata) -> Image:
+    def _image_normalization(self, file_or_image, image_config_metadata: ImageConfigMetadata) -> Image:
         """
         Normaliza la imagen como preprocesamiento para el modelo de detección de material particulado.
         - Ajusta el contraste
@@ -94,16 +97,47 @@ class ImageUseCase:
         - Reduce el ruido
     
         Args:
-            image: Imagen a normalizar
+            file_or_image: Archivo o imagen a normalizar
+            image_config_metadata: Metadatos de configuración de la imagen
             
         Returns:
             Image: Imagen normalizada
         """
-        exposure_corrected_image = ImageProcessingUtils.exposure_correction(image, image_config_metadata)
-        white_balanced_image = ImageProcessingUtils.white_balance_correction(exposure_corrected_image)
-        noise_reduced_image = ImageProcessingUtils.noise_reduction(white_balanced_image)
-        return noise_reduced_image
-    
+        # Si es un UploadFile, convertirlo a Image
+        if isinstance(file_or_image, UploadFile):
+            # Convertir UploadFile a PIL.Image
+            try:
+                # Leer el contenido del archivo
+                file_contents = file_or_image.file.read()
+                # Volver a la posición inicial para futuras lecturas
+                file_or_image.file.seek(0)
+                # Crear objeto Image
+                image = Image.open(io.BytesIO(file_contents))
+            except Exception as e:
+                logger.error(f"Error al convertir UploadFile a Image: {e}")
+                # En caso de error, usar un enfoque alternativo
+                stat = ImageStat.Stat(file_or_image)
+                mean_lum = sum(stat.mean) / len(stat.mean)
+                desired_mean = 128
+                if mean_lum < 1: mean_lum = 1
+                scale = desired_mean / mean_lum
+                enhancer = ImageEnhance.Brightness(file_or_image)
+                return enhancer.enhance(scale)
+        else:
+            # Ya es un objeto Image
+            image = file_or_image
+            
+        # Aplicar correcciones
+        try:
+            exposure_corrected_image = ImageProcessingUtils.exposure_correction(image, image_config_metadata)
+            #white_balanced_image = ImageProcessingUtils.white_balance_correction(exposure_corrected_image)
+            #noise_reduced_image = ImageProcessingUtils.noise_reduction(white_balanced_image)
+            #return noise_reduced_image
+            return exposure_corrected_image
+        except Exception as e:
+            logger.error(f"Error en la normalización de imagen: {e}")
+            # En caso de error, devolver la imagen original
+            return image
     def _image_processing(self, image: Image) -> list[float]:
         """
         Procesa la imagen para detectar la cantidad de material particulado presente.

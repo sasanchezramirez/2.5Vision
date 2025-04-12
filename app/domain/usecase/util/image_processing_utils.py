@@ -35,6 +35,7 @@ class ImageProcessingUtils:
         
         Args:
             image: Imagen a ajustar
+            image_config_metadata: Metadatos de configuración de la imagen
             
         Returns:
             Image: Imagen con contraste ajustado
@@ -45,6 +46,9 @@ class ImageProcessingUtils:
         aperture = image_config_metadata.aperture
         exposure_compensation = image_config_metadata.exposure_compensation
 
+        # Usar 0.0 como valor por defecto para exposure_compensation si es None
+        if exposure_compensation is None:
+            exposure_compensation = 0.0
 
         if iso and shutter_speed and aperture:
             current_ev = (log2(aperture**2 / shutter_speed)
