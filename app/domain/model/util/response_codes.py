@@ -19,6 +19,7 @@ class ResponseCodeEnum(Enum):
     KOG01 = (500, "Internal Server Error")
 
     VIM01 = (400, "Invalid image metadata")
+    VIM02 = (400, "Hubo un error al subir la imagen a S3")
 
     KO000 = (200, "Operation successful")
 

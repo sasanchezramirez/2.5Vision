@@ -161,6 +161,8 @@ class Persistence(PersistenceGateway):
         Returns:
             ImageMetadata: Metadato de imagen creado.
         """
+        logger.info("Inicia el flujo de creación de metadatos de imagen en base de datos")
+        logger.info(f"Metadatos de imagen a crear: {image_metadata}")
         try:
             image_metadata_entity = ImageMapper.map_image_metadata_to_entity(image_metadata)
             self.image_repository.create_image_metadata(image_metadata_entity)

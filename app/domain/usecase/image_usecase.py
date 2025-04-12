@@ -54,7 +54,7 @@ class ImageUseCase:
         pm_estimation = self._get_pm_qualitative_estimation(pm_quantitative_estimation)
         return pm_estimation
     
-    async def upload_image(self, file: UploadFile, image_metadata: ImageMetadata) -> dict:
+    async def upload_image(self, file: UploadFile, image_metadata: ImageMetadata) -> ImageMetadata:
         """
         Sube una imagen a un bucket de AWS S3.  
 
@@ -71,8 +71,8 @@ class ImageUseCase:
             raise ValueError("No se pudo obtener la latitud y longitud de la imagen")
         image_metadata.latitude = gps_data.latitude
         image_metadata.longitude = gps_data.longitude  
-        normalized_image = self._image_normalization(file)
-        image_url = self.s3_gateway.upload_image(normalized_image)
+        #normalized_image = self._image_normalization(file)
+        image_url = self.s3_gateway.upload_image(file).image_url
         image_metadata.image_url = image_url
         self.persistence_gateway.create_image_metadata(image_metadata)
         logger.info(f"Imagen subida a S3: {image_url}")

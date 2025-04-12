@@ -1,16 +1,16 @@
 from abc import ABC, abstractmethod
 from fastapi import UploadFile
-from typing import Dict, Any
+from app.infrastructure.driven_adapter.s3.dto.upload_image_response import UploadImageResponse
 
 class S3Gateway(ABC):
     @abstractmethod
-    def upload_image(self, file: UploadFile) -> Dict[str, Any]:
+    def upload_image(self, file: UploadFile) -> UploadImageResponse:
         """
         Sube una imagen a un bucket de AWS S3.
         Args:
             file: Archivo de imagen a subir
 
         Returns:
-            Dict[str, Any]: Información sobre la imagen subida (URL, nombre, tipo, tamaño)
+            UploadImageResponse: Respuesta con la URL de la imagen subida y algunos datos de la imagen
         """
         pass

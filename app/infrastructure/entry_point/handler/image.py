@@ -112,12 +112,13 @@ async def upload_image(
         image_metadata = ImageMapper.map_upload_image_request_to_image_metadata(datetime_taken, visibility_score, weather_tags, uploader_username)
 
         image_info = await image_usecase.upload_image(file, image_metadata)
+        image_response = ImageMapper.map_upload_image_response_to_image_metadata(image_info)
         
-        response_data = ImageUploadResponse(**image_info).model_dump()
+        response_dict = image_response.model_dump()
         
         return JSONResponse(
             status_code=200,
-            content=ApiResponse.create_response(ResponseCodeEnum.KO000, response_data)
+            content=ApiResponse.create_response(ResponseCodeEnum.KO000, response_dict)
         )
     except ValueError as e:
         return JSONResponse(
