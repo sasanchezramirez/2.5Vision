@@ -106,11 +106,12 @@ class ImageUseCase:
             Image: Imagen normalizada
         """
         try:
+            logger.info("Inicia el flujo de normalización de imagen")
             exposure_corrected_image = ImageProcessingUtils.exposure_correction(image, image_config_metadata)
-            #white_balanced_image = ImageProcessingUtils.white_balance_correction(exposure_corrected_image)
+            white_balanced_image = ImageProcessingUtils.white_balance_correction(exposure_corrected_image)
             #noise_reduced_image = ImageProcessingUtils.noise_reduction(white_balanced_image)
             #return noise_reduced_image
-            return exposure_corrected_image
+            return white_balanced_image
         except Exception as e:
             logger.error(f"Error en la normalización de imagen: {e}")
             return image

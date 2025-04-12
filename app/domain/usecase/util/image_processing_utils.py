@@ -81,14 +81,41 @@ class ImageProcessingUtils:
     def white_balance_correction(image: Image) -> Image:
         """
         Ajusta el balance de blancos de la imagen para que los colores sean más naturales.
-        
+        Para esto primero se calcula el promedio de cada canal de la imagen,
+        luego se asume un valor de gris neutro para cada canal y se calcula el factor de corrección
+        para cada canal.
         Args:
             image: Imagen a ajustar
             
         Returns:
             Image: Imagen con balance de blancos ajustado
         """
-        pass
+
+        logger.info("Inicia el flujo de corrección de balance de blancos a la imagen")
+        img_array = np.array(image).astype(float)
+
+
+        mean_r = np.mean(img_array[:, :, 0])
+        mean_g = np.mean(img_array[:, :, 1])
+        mean_b = np.mean(img_array[:, :, 2])
+
+        mean_gray = (mean_r + mean_g + mean_b) / 3
+
+
+        factor_r = mean_gray / mean_r if mean_r != 0 else 1
+        factor_g = mean_gray / mean_g if mean_g != 0 else 1
+        factor_b = mean_gray / mean_b if mean_b != 0 else 1
+
+        # Aquí se corrección multiplicativa
+        img_array[:, :, 0] *= factor_r
+        img_array[:, :, 1] *= factor_g
+        img_array[:, :, 2] *= factor_b
+
+        # Clip a [0, 255] y convertir a uint8. 
+        # Esto es para que los valores no se salgan de los límites de 0 a 255
+        img_array = np.clip(img_array, 0, 255).astype(np.uint8)
+        logger.info("Finaliza el flujo de corrección de balance de blancos a la imagen")
+        return Image.fromarray(img_array)
     
     @staticmethod
     def noise_reduction(image: Image) -> Image:
