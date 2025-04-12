@@ -1,12 +1,14 @@
 import logging
 from typing import Final, Tuple
 import io
-from PIL import Image
+from PIL import Image, ImageEnhance, ImageStat
 import numpy as np
 from app.domain.model.util.custom_exceptions import CustomException
 from app.domain.model.util.response_codes import ResponseCodeEnum
 from fastapi import UploadFile
 from PIL.ExifTags import TAGS, GPSTAGS
+from app.domain.model.image_config_metadata import ImageConfigMetadata
+from math import log2
 
 logger: Final[logging.Logger] = logging.getLogger("Image Processing Utils")
 
@@ -26,9 +28,10 @@ class ImageProcessingUtils:
         return image
 
     @staticmethod
-    def exposure_correction(image: Image) -> Image:
+    def exposure_correction(image: Image, image_config_metadata: ImageConfigMetadata) -> Image:
         """
-        Ajusta el contraste de la imagen para que los detalles sean más visibles.
+        Ajusta el contraste de la imagen para que los detalles sean más visibles. Esto se hace usando los metadatos de la imagen
+        y estableciendo un valor objetivo de estandarizacion para la exposición de cada una de las imágenes
         
         Args:
             image: Imagen a ajustar
@@ -36,7 +39,39 @@ class ImageProcessingUtils:
         Returns:
             Image: Imagen con contraste ajustado
         """
-        pass
+        logger.info("Inicia el flujo de corrección de exposición a la imagen")
+        iso = image_config_metadata.iso
+        shutter_speed = image_config_metadata.shutter_speed
+        aperture = image_config_metadata.aperture
+        exposure_compensation = image_config_metadata.exposure_compensation
+
+
+        if iso and shutter_speed and aperture:
+            current_ev = (log2(aperture**2 / shutter_speed)
+                        - log2(iso / 100)
+                        - exposure_compensation)
+            target_ev = 13.0
+            delta_ev = target_ev - current_ev
+
+            #Aquí se aplica el factor de escala
+            logger.info(f"Aplica el factor de escala a la imagen: {delta_ev}")
+            scale = 2**delta_ev
+            enhancer = ImageEnhance.Brightness(image)
+            corrected_image = enhancer.enhance(scale)
+            return corrected_image
+        else:
+            logger.info("No se pudo aplicar la corrección de exposición a la imagen por ausencia de metadatos")
+            stat = ImageStat.Stat(image)
+            mean_lum = sum(stat.mean) / len(stat.mean)  
+
+            desired_mean = 128 
+            if mean_lum < 1: mean_lum = 1
+            scale = desired_mean / mean_lum
+
+            enhancer = ImageEnhance.Brightness(image)
+            corrected_image = enhancer.enhance(scale)
+            return corrected_image
+
 
     @staticmethod
     def white_balance_correction(image: Image) -> Image:

@@ -18,6 +18,8 @@ from app.domain.model.pm_estimation import PMEstimation
 from app.domain.model.zones import ZoneDictionary
 from app.domain.model.data_sensors import DataSensor
 from app.domain.model.image_metadata import ImageMetadata
+from app.domain.model.image_config_metadata import ImageConfigMetadata
+
 logger: Final[logging.Logger] = logging.getLogger("Image UseCase")
 
 class ImageUseCase:
@@ -75,8 +77,8 @@ class ImageUseCase:
             has_metadata = False
             image_metadata.latitude = None
             image_metadata.longitude = None
-       
-        #normalized_image = self._image_normalization(file)
+        image_config_metadata = self._get_image_configuration_metadata(image_pilow)
+        #normalized_image = self._image_normalization(file, image_config_metadata)
         file_details = self.s3_gateway.upload_image(file, has_metadata)
         image_metadata.image_url = file_details.image_url
         image_metadata.image_name = file_details.image_name
@@ -84,7 +86,7 @@ class ImageUseCase:
         logger.info(f"Imagen subida a S3: {image_metadata.image_url}")
         return image_metadata
     
-    def _image_normalization(self, image: Image) -> Image:
+    def _image_normalization(self, image: Image, image_config_metadata: ImageConfigMetadata) -> Image:
         """
         Normaliza la imagen como preprocesamiento para el modelo de detección de material particulado.
         - Ajusta el contraste
@@ -97,7 +99,7 @@ class ImageUseCase:
         Returns:
             Image: Imagen normalizada
         """
-        exposure_corrected_image = ImageProcessingUtils.exposure_correction(image)
+        exposure_corrected_image = ImageProcessingUtils.exposure_correction(image, image_config_metadata)
         white_balanced_image = ImageProcessingUtils.white_balance_correction(exposure_corrected_image)
         noise_reduced_image = ImageProcessingUtils.noise_reduction(white_balanced_image)
         return noise_reduced_image
@@ -122,6 +124,30 @@ class ImageUseCase:
         mean = StatisticalUtils.get_mean(pixel_values)
         feature_vector = [median, mean]
         return feature_vector
+    
+    def _get_image_configuration_metadata(self, image: Image) -> ImageConfigMetadata:
+        """
+        Obtiene los metadatos de la imagen.
+        - Obtiene los metadatos de configuracion de la cámara con la que se tomó la imagen.
+        Args:
+            image: Imagen a procesar
+
+        Returns:
+            ImageConfigMetadata: Metadatos de la imagen
+        """
+        image_metadata = ImageProcessingUtils.get_image_metadata(image)
+        image_config_metadata = ImageConfigMetadata(
+            camera_make= image_metadata.get("CameraMake") if image_metadata.get("CameraMake") else None,
+            camera_model=image_metadata.get("CameraModel") if image_metadata.get("CameraModel") else None,
+            iso=image_metadata.get("ISO") if image_metadata.get("ISO") else None,
+            shutter_speed=image_metadata.get("ShutterSpeed") if image_metadata.get("ShutterSpeed") else None,
+            aperture=image_metadata.get("Aperture") if image_metadata.get("Aperture") else None,
+            exposure_compensation=image_metadata.get("ExposureCompensation") if image_metadata.get("ExposureCompensation") else None,
+            focal_length=image_metadata.get("FocalLength") if image_metadata.get("FocalLength") else None,
+            datetime_original=image_metadata.get("DateTimeOriginal") if image_metadata.get("DateTimeOriginal") else None
+        )
+        return image_config_metadata
+        
 
     def _get_gps_data(self, image: Image) -> GPS:
         """
