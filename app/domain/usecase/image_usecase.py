@@ -84,11 +84,11 @@ class ImageUseCase:
             image_metadata.longitude = None
         image_config_metadata = self._get_image_configuration_metadata(image_pilow)
         normalized_image = self._image_normalization(image_pilow, image_config_metadata)
-        file_details = self.s3_gateway.upload_image(file, has_metadata)
+        file_details = self.s3_gateway.upload_image(normalized_image, has_metadata)
         image_metadata.image_url = file_details.image_url
         image_metadata.image_name = file_details.image_name
         self.persistence_gateway.create_image_metadata(image_metadata)
-        logger.info(f"Imagen subida a S3: {image_metadata.image_url}")
+        logger.info(f"Imagen subida a S3 y metadatos guardados en la base de datos: {image_metadata.image_url}")
         return image_metadata
     
     def _image_normalization(self, image: Image, image_config_metadata: ImageConfigMetadata) -> Image:
@@ -105,13 +105,18 @@ class ImageUseCase:
         Returns:
             Image: Imagen normalizada
         """
+
+
         try:
             logger.info("Inicia el flujo de normalización de imagen")
+            exif_data = image._getexif()
             exposure_corrected_image = ImageProcessingUtils.exposure_correction(image, image_config_metadata)
             white_balanced_image = ImageProcessingUtils.white_balance_correction(exposure_corrected_image)
-            #noise_reduced_image = ImageProcessingUtils.noise_reduction(white_balanced_image)
-            #return noise_reduced_image
-            return white_balanced_image
+            resized_image = ImageProcessingUtils.resize_image(white_balanced_image)
+            if exif_data:
+                resized_image.info["exif"] = exif_data
+            logger.info("Finaliza el flujo de normalización de imagen")
+            return resized_image
         except Exception as e:
             logger.error(f"Error en la normalización de imagen: {e}")
             return image

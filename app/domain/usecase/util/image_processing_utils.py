@@ -175,5 +175,23 @@ class ImageProcessingUtils:
         except Exception as e:
             logger.error(f"Error al obtener los metadatos de la imagen: {e}")
             raise CustomException(ResponseCodeEnum.VIM01)   
+        
+    @staticmethod
+    def resize_image(image: Image) -> Image:
+        """
+        Redimensiona la imagen para que los detalles sean más claros.
+        Se estandariza el tamaño de la imagen a 512x512.
+        
+        Args:
+            image: Imagen a redimensionar
+            image_config_metadata: Metadatos de configuración de la imagen
+            
+        Returns:
+            Image: Imagen redimensionada
+        """
+        logger.info("Inicia el flujo de redimensionamiento de la imagen")
+        image = image.resize((512, 512))
+        logger.info("Finaliza el flujo de redimensionamiento de la imagen")
+        return image
     
 
