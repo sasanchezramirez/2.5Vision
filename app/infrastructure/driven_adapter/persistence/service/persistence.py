@@ -114,6 +114,8 @@ class Persistence(PersistenceGateway):
         """
         try:
             user_entity = self.user_repository.get_user_by_username(username)
+            if not user_entity:
+                raise CustomException(ResponseCodeEnum.KOU02)
             return mapper.map_entity_to_user(user_entity)
         except CustomException as e:
             raise e
