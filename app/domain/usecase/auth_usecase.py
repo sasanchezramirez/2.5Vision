@@ -75,8 +75,36 @@ class AuthUseCase:
         except Exception as e:
             logger.error(f"Error no manejado al obtener usuario: {e}")
             raise CustomException(ResponseCodeEnum.KOG01)
+        
+    def change_password(self, user: User, new_password: str) -> User:
+        """
+        Cambia la contraseña de un usuario.
 
+        Args:
+            user: Usuario con la nueva contraseña
 
+        Returns:
+            User: Usuario con la nueva contraseña
+
+        Raises:
+            CustomException: Si hay un error al cambiar la contraseña
+        """
+        try:
+            user_validated = self.get_user(user)
+            if not user_validated:
+                raise CustomException(ResponseCodeEnum.KOU02)
+            if not verify_password(user.password, user_validated.password):
+                raise CustomException(ResponseCodeEnum.KOU03)
+
+            user_validated.password = new_password
+            user_saved = self.persistence_gateway.update_user(user_validated)
+            return user_saved
+        except CustomException as e:
+            logger.error(f"Error al cambiar la contraseña: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Error no manejado al cambiar la contraseña: {e}")
+            raise CustomException(ResponseCodeEnum.KOG01)
 
             
 

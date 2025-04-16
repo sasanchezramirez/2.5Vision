@@ -1,5 +1,3 @@
-from typing import Final
-
 from datetime import datetime
 from app.domain.model.user import User
 from app.infrastructure.entry_point.dto.user_dto import (
@@ -7,7 +5,8 @@ from app.infrastructure.entry_point.dto.user_dto import (
     GetUser,
     UserOutput,
     LoginInput,
-    UpdateUserInput
+    UpdateUserInput,
+    ChangePasswordInput
 )
 
 
@@ -111,3 +110,18 @@ def map_update_user_dto_to_user(user_dto: UpdateUserInput) -> User:
         user_data["password"] = user_dto.password
     
     return User(**user_data)
+
+def map_change_password_dto_to_user(user_dto: ChangePasswordInput) -> User:
+    """
+    Mapea un DTO de cambio de contraseña a un modelo de dominio.
+
+    Args:
+        user_dto: DTO con los datos para cambiar la contraseña
+
+    Returns:
+        User: Modelo de dominio de usuario
+    """
+    return User(
+        username=user_dto.username.lower(),
+        password=user_dto.old_password
+    )

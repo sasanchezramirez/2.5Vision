@@ -26,7 +26,8 @@ class User(BaseModel):
         min_length=8
     )
     
-    creation_date: str = Field(
+    creation_date: Optional[str] = Field(
+        default=None,
         description="Fecha de creación del usuario en formato ISO"
     )
     

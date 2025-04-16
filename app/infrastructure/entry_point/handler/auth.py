@@ -11,9 +11,10 @@ from app.infrastructure.entry_point.mapper.user_mapper import (
     map_get_user_dto_to_user,
     map_login_dto_to_user,
     map_update_user_dto_to_user,
-    map_user_to_user_output_dto
+    map_user_to_user_output_dto,
+    map_change_password_dto_to_user
 )
-from app.infrastructure.entry_point.dto.user_dto import NewUserInput, GetUser, LoginInput, Token, UpdateUserInput
+from app.infrastructure.entry_point.dto.user_dto import NewUserInput, GetUser, LoginInput, Token, UpdateUserInput, ChangePasswordInput
 from app.domain.usecase.user_usecase import UserUseCase
 from app.domain.usecase.auth_usecase import AuthUseCase
 from app.application.container import Container
@@ -214,4 +215,35 @@ def update_user(
         return JSONResponse(
             status_code=500,
             content=ApiResponse.create_response(ResponseCodeEnum.KOG01)
+        )
+    
+@router.post('/change-password', response_model=ResponseDTO)
+@inject
+def change_password(
+    change_password_dto: ChangePasswordInput,
+    auth_usecase: AuthUseCase = Depends(Provide[Container.auth_usecase])
+    ) -> JSONResponse:
+    """
+    Cambia la contraseña de un usuario.
+
+    Args:
+        change_password_dto: Objeto con los datos para cambiar la contraseña
+        auth_usecase: Caso de uso para operaciones de autenticación
+
+    Returns:
+        JSONResponse: Respuesta con el resultado de la operación
+    """
+    logger.info("Iniciando cambio de contraseña")
+    try:
+        user = map_change_password_dto_to_user(change_password_dto)
+        user_saved = auth_usecase.change_password(user, change_password_dto.new_password)
+        response_data = map_user_to_user_output_dto(user_saved).model_dump()
+        return JSONResponse(
+            status_code=200,
+            content=ApiResponse.create_response(ResponseCodeEnum.KO000, response_data)
+        )
+    except CustomException as e:
+        return JSONResponse(
+            status_code=e.http_status,
+            content=e.to_dict()
         )

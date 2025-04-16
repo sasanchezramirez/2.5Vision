@@ -104,6 +104,24 @@ class LoginInput(BaseModel):
         example="contraseña123"
     )
 
+class ChangePasswordInput(BaseModel):
+    """
+    DTO para el cambio de contraseña.
+    """
+    old_password: str = Field(
+        description="Contraseña actual del usuario",
+        min_length=8,
+        example="contraseña123"
+    )
+    new_password: str = Field(
+        description="Nueva contraseña del usuario",
+        min_length=8,
+        example="nuevaContraseña123"
+    )
+    username: str = Field(
+        description="Nombre de usuario del usuario",
+        example="usuario"
+    )
 
 class UpdateUserInput(BaseModel):
     """
