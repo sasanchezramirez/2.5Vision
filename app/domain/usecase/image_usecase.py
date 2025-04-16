@@ -110,9 +110,9 @@ class ImageUseCase:
         try:
             logger.info("Inicia el flujo de normalización de imagen")
             exif_data = image._getexif()
-            exposure_corrected_image = ImageProcessingUtils.exposure_correction(image, image_config_metadata)
+            #exposure_corrected_image = ImageProcessingUtils.exposure_correction(image, image_config_metadata)
             #white_balanced_image = ImageProcessingUtils.white_balance_correction(exposure_corrected_image)
-            resized_image = ImageProcessingUtils.resize_image(exposure_corrected_image)
+            resized_image = ImageProcessingUtils.resize_image(image)
             if exif_data:
                 resized_image.info["exif"] = exif_data
             logger.info("Finaliza el flujo de normalización de imagen")
