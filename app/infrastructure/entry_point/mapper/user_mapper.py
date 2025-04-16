@@ -22,7 +22,7 @@ def map_user_dto_to_user(user_dto: NewUserInput) -> User:
         User: Modelo de dominio de usuario
     """
     return User(
-        username=user_dto.username,
+        username=user_dto.username.lower(),
         password=user_dto.password,
         profile_id=user_dto.profile_id,
         status_id=user_dto.status_id,
@@ -65,7 +65,7 @@ def map_get_user_dto_to_user(user_dto: GetUser) -> User:
     
     return User(
         id=user_dto.id,
-        username=username,
+        username=username.lower(),
         creation_date=datetime.now().isoformat()  # Fecha por defecto para búsqueda
     )
 
@@ -81,7 +81,7 @@ def map_login_dto_to_user(user_dto: LoginInput) -> User:
         User: Modelo de dominio de usuario
     """
     return User(
-        username=user_dto.username,
+        username=user_dto.username.lower(),
         password=user_dto.password,
         creation_date=datetime.now().isoformat()  # Fecha por defecto para login
     )
@@ -100,7 +100,7 @@ def map_update_user_dto_to_user(user_dto: UpdateUserInput) -> User:
     # Crear diccionario con los campos base
     user_data = {
         "id": user_dto.id,
-        "username": user_dto.username,
+        "username": user_dto.username.lower(),
         "profile_id": user_dto.profile_id,
         "status_id": user_dto.status_id,
         "creation_date": datetime.now().isoformat()  # Fecha por defecto para actualización
