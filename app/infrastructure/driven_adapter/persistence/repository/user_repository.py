@@ -44,7 +44,7 @@ class UserRepository:
         Raises:
             CustomException: Si hay un error al crear el usuario
         """
-        logger.info(f"Creando usuario: {user.email}")
+        logger.info(f"Creando usuario: {user.username}")
         try:
             user_entity = map_user_to_entity(user)
             self.session.add(user_entity)
