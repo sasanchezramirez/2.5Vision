@@ -25,6 +25,10 @@ class NewUserInput(BaseModel):
         gt=0,
         example=1
     )
+    contact_info: str = Field(
+        description="Información de contacto del usuario",
+        example="usuario@example.com"
+    )
 
 
 class UserOutput(BaseModel):
