@@ -8,6 +8,7 @@ from app.domain.model.util.response_codes import ResponseCodeEnum
 from app.domain.gateway.persistence_gateway import PersistenceGateway
 from app.domain.usecase.util.security import verify_password
 from app.domain.usecase.util.jwt import create_access_token
+from app.domain.usecase.util.security import hash_password
 
 
 logger: Final[logging.Logger] = logging.getLogger("Auth UseCase")
@@ -43,9 +44,14 @@ class AuthUseCase:
         """
         try:
             user_validated = self.get_user(user)
-            if user and verify_password(user.password, user_validated.password):
-                return create_access_token({"sub": user.email})
-            return None
+            try:
+                if user and verify_password(user.password, user_validated.password):
+                    return create_access_token({"sub": user.username})
+                else:
+                    raise CustomException(ResponseCodeEnum.KOD02)
+            except ValueError as ve:
+                logger.error(f"Error en formato de hash: {ve}")
+                raise CustomException(ResponseCodeEnum.KOD02)
         except CustomException as e:
             logger.error(f"Error de autenticación: {e}")
             raise
@@ -55,10 +61,10 @@ class AuthUseCase:
 
     def get_user(self, user_to_get: User) -> User:
         """
-        Obtiene un usuario por su correo electrónico.
+        Obtiene un usuario por su nombre de usuario.
 
         Args:
-            user_to_get: Usuario con el correo electrónico a buscar
+            user_to_get: Usuario con el nombre de usuario a buscar
 
         Returns:
             User: Usuario encontrado
@@ -66,17 +72,49 @@ class AuthUseCase:
         Raises:
             CustomException: Si hay un error al obtener el usuario
         """
-        logger.info("Iniciando búsqueda de usuario por correo electrónico")
+        logger.info("Iniciando búsqueda de usuario por nombre de usuario")
         try:
-            return self.persistence_gateway.get_user_by_email(user_to_get.email)
+            return self.persistence_gateway.get_user_by_username(user_to_get.username)
         except CustomException as e:
             logger.error(f"Error al obtener usuario: {e}")
             raise
         except Exception as e:
             logger.error(f"Error no manejado al obtener usuario: {e}")
             raise CustomException(ResponseCodeEnum.KOG01)
+        
+    def change_password(self, user: User, new_password: str) -> User:
+        """
+        Cambia la contraseña de un usuario.
 
+        Args:
+            user: Usuario con la nueva contraseña
 
+        Returns:
+            User: Usuario con la nueva contraseña
+
+        Raises:
+            CustomException: Si hay un error al cambiar la contraseña
+        """
+        try:
+            user_validated = self.get_user(user)
+            if not user_validated:
+                raise CustomException(ResponseCodeEnum.KOU02)
+            try:
+                if not verify_password(user.password, user_validated.password):
+                    raise CustomException(ResponseCodeEnum.KOU03)
+            except ValueError as ve:
+                logger.error(f"Error en formato de hash: {ve}")
+                raise CustomException(ResponseCodeEnum.KOU03)
+            new_password_hashed = hash_password(new_password)
+            user_validated.password = new_password_hashed
+            user_saved = self.persistence_gateway.update_user(user_validated)
+            return user_saved
+        except CustomException as e:
+            logger.error(f"Error al cambiar la contraseña: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Error no manejado al cambiar la contraseña: {e}")
+            raise CustomException(ResponseCodeEnum.KOG01)
 
             
 

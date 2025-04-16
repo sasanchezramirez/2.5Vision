@@ -55,8 +55,8 @@ class Persistence(PersistenceGateway):
             CustomException: Si hay un error en la validación o en la operación de base de datos.
         """
         try:
-            # Verificar si el email ya existe
-            existing_user = self.user_repository.get_user_by_email(user.email)
+            # Verificar si el nombre de usuario ya existe
+            existing_user = self.user_repository.get_user_by_username(user.username)
             if existing_user:
                 raise CustomException(ResponseCodeEnum.KOU01)
                 
@@ -99,12 +99,12 @@ class Persistence(PersistenceGateway):
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
         
-    def get_user_by_email(self, email: str) -> Optional[User]:
+    def get_user_by_username(self, username: str) -> Optional[User]:
         """
-        Obtiene un usuario por su email.
+        Obtiene un usuario por su nombre de usuario.
         
         Args:
-            email (str): Email del usuario a buscar.
+            username (str): Nombre de usuario del usuario a buscar.
             
         Returns:
             Optional[User]: Usuario encontrado o None si no existe.
@@ -113,7 +113,9 @@ class Persistence(PersistenceGateway):
             CustomException: Si hay un error en la operación de base de datos.
         """
         try:
-            user_entity = self.user_repository.get_user_by_email(email)
+            user_entity = self.user_repository.get_user_by_username(username)
+            if not user_entity:
+                raise CustomException(ResponseCodeEnum.KOU02)
             return mapper.map_entity_to_user(user_entity)
         except CustomException as e:
             raise e

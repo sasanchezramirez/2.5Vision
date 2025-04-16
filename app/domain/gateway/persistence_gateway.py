@@ -46,12 +46,12 @@ class PersistenceGateway(ABC):
         pass
 
     @abstractmethod
-    def get_user_by_email(self, email: str) -> Optional[User]:
+    def get_user_by_username(self, username: str) -> Optional[User]:
         """
-        Obtiene un usuario por su correo electrónico.
+        Obtiene un usuario por su nombre de usuario.
 
         Args:
-            email: Correo electrónico del usuario a buscar
+            username: Nombre de usuario del usuario a buscar
 
         Returns:
             Optional[User]: Usuario encontrado o None si no existe

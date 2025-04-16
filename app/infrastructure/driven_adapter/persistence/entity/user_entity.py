@@ -18,25 +18,25 @@ class UserEntity(Base):
     __table_args__ = {"schema": "vision_2_5"} 
 
     id: int = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    email: str = Column(String, unique=True, index=True, nullable=False)
+    username: str = Column(String, unique=True, index=True, nullable=False)
     password: str = Column(String, nullable=False)
     creation_date: str = Column(String, nullable=False)
     profile_id: Optional[int] = Column(Integer, nullable=True)
     status_id: Optional[int] = Column(Integer, nullable=True)
 
-    def __init__(self, email: str, password: str, creation_date: str, 
+    def __init__(self, username: str, password: str, creation_date: str, 
                  profile_id: Optional[int] = None, status_id: Optional[int] = None) -> None:
         """
         Inicializa una entidad de usuario.
 
         Args:
-            email: Correo electrónico del usuario
+            username: Nombre de usuario del usuario
             password: Contraseña del usuario
             creation_date: Fecha de creación del usuario
             profile_id: ID del perfil del usuario (opcional)
             status_id: ID del estado del usuario (opcional)
         """
-        self.email = email
+        self.username = username
         self.password = password
         self.creation_date = creation_date
         self.profile_id = profile_id
@@ -54,7 +54,7 @@ class UserEntity(Base):
             UserEntity: Entidad de usuario
         """
         return cls(
-            email=user.email,
+            username=user.username,
             password=user.password or "",  # Si no hay contraseña, usar cadena vacía
             creation_date=user.creation_date,
             profile_id=user.profile_id,
@@ -68,6 +68,6 @@ class UserEntity(Base):
         Returns:
             str: Representación de la entidad
         """
-        return f"<UserEntity(id={self.id}, email={self.email})>"
+        return f"<UserEntity(id={self.id}, username={self.username})>"
 
 

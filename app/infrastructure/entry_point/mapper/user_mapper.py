@@ -1,5 +1,3 @@
-from typing import Final
-
 from datetime import datetime
 from app.domain.model.user import User
 from app.infrastructure.entry_point.dto.user_dto import (
@@ -7,7 +5,8 @@ from app.infrastructure.entry_point.dto.user_dto import (
     GetUser,
     UserOutput,
     LoginInput,
-    UpdateUserInput
+    UpdateUserInput,
+    ChangePasswordInput
 )
 
 
@@ -22,7 +21,7 @@ def map_user_dto_to_user(user_dto: NewUserInput) -> User:
         User: Modelo de dominio de usuario
     """
     return User(
-        email=user_dto.email,
+        username=user_dto.username.lower(),
         password=user_dto.password,
         profile_id=user_dto.profile_id,
         status_id=user_dto.status_id,
@@ -42,7 +41,7 @@ def map_user_to_user_output_dto(user: User) -> UserOutput:
     """
     return UserOutput(
         id=user.id,
-        email=user.email,
+        username=user.username,
         creation_date=user.creation_date,
         profile_id=user.profile_id,
         status_id=user.status_id
@@ -59,13 +58,13 @@ def map_get_user_dto_to_user(user_dto: GetUser) -> User:
     Returns:
         User: Modelo de dominio de usuario
     """
-    # Si no hay email, usar un email por defecto para la validación
-    # El email real se manejará en el caso de uso
-    email = user_dto.email if user_dto.email else "default@example.com"
+    # Si no hay username, usar un username por defecto para la validación
+    # El username real se manejará en el caso de uso
+    username = user_dto.username if user_dto.username else "default"
     
     return User(
         id=user_dto.id,
-        email=email,
+        username=username.lower(),
         creation_date=datetime.now().isoformat()  # Fecha por defecto para búsqueda
     )
 
@@ -81,7 +80,7 @@ def map_login_dto_to_user(user_dto: LoginInput) -> User:
         User: Modelo de dominio de usuario
     """
     return User(
-        email=user_dto.email,
+        username=user_dto.username.lower(),
         password=user_dto.password,
         creation_date=datetime.now().isoformat()  # Fecha por defecto para login
     )
@@ -100,7 +99,7 @@ def map_update_user_dto_to_user(user_dto: UpdateUserInput) -> User:
     # Crear diccionario con los campos base
     user_data = {
         "id": user_dto.id,
-        "email": user_dto.email,
+        "username": user_dto.username.lower(),
         "profile_id": user_dto.profile_id,
         "status_id": user_dto.status_id,
         "creation_date": datetime.now().isoformat()  # Fecha por defecto para actualización
@@ -111,3 +110,18 @@ def map_update_user_dto_to_user(user_dto: UpdateUserInput) -> User:
         user_data["password"] = user_dto.password
     
     return User(**user_data)
+
+def map_change_password_dto_to_user(user_dto: ChangePasswordInput) -> User:
+    """
+    Mapea un DTO de cambio de contraseña a un modelo de dominio.
+
+    Args:
+        user_dto: DTO con los datos para cambiar la contraseña
+
+    Returns:
+        User: Modelo de dominio de usuario
+    """
+    return User(
+        username=user_dto.username.lower(),
+        password=user_dto.old_password
+    )

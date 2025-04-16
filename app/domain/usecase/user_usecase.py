@@ -57,13 +57,13 @@ class UserUseCase:
 
     def get_user(self, user: User) -> User:
         """
-        Obtiene un usuario por su ID o email.
-        Si se proporciona el email, se busca por email.
-        Si el email está vacío, se busca por ID.
-        Si se proporcionan ambos, se prioriza la búsqueda por email.
+        Obtiene un usuario por su ID o username.
+        Si se proporciona el username, se busca por username.
+        Si el username está vacío, se busca por ID.
+        Si se proporcionan ambos, se prioriza la búsqueda por username.
 
         Args:
-            user: Usuario con ID o email para buscar
+            user: Usuario con ID o username para buscar
 
         Returns:
             User: Usuario encontrado
@@ -73,18 +73,18 @@ class UserUseCase:
         """
         logger.info("Iniciando obtención de usuario")
         try:
-            # Si se proporciona el email, buscar por email
-            if user.email and user.email != "default@example.com":
-                logger.info(f"Buscando usuario por email: {user.email}")
-                return self.persistence_gateway.get_user_by_email(user.email)
+            # Si se proporciona el username, buscar por username
+            if user.username and user.username != "default":
+                logger.info(f"Buscando usuario por username: {user.username}")
+                return self.persistence_gateway.get_user_by_username(user.username)
             
-            # Si no hay email o está vacío, buscar por ID
+            # Si no hay username o está vacío, buscar por ID
             if user.id:
                 logger.info(f"Buscando usuario por ID: {user.id}")
                 return self.persistence_gateway.get_user_by_id(user.id)
             
-            # Si no hay ni email ni ID, lanzar error
-            logger.error("No se proporcionó ni email ni ID para la búsqueda")
+            # Si no hay ni username ni ID, lanzar error
+            logger.error("No se proporcionó ni username ni ID para la búsqueda")
             raise CustomException(ResponseCodeEnum.KOU02)
             
         except CustomException as e:

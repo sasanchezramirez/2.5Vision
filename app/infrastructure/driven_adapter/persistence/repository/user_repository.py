@@ -44,7 +44,7 @@ class UserRepository:
         Raises:
             CustomException: Si hay un error al crear el usuario
         """
-        logger.info(f"Creando usuario: {user.email}")
+        logger.info(f"Creando usuario: {user.username}")
         try:
             user_entity = map_user_to_entity(user)
             self.session.add(user_entity)
@@ -93,12 +93,12 @@ class UserRepository:
             logger.error(f"Error no manejado: {e}")
             raise CustomException(ResponseCodeEnum.KOG01)
 
-    def get_user_by_email(self, email: str) -> Optional[User]:
+    def get_user_by_username(self, username: str) -> Optional[User]:
         """
-        Obtiene un usuario por su email.
+        Obtiene un usuario por su nombre de usuario.
 
         Args:
-            email: Email del usuario a buscar
+            username: Nombre de usuario del usuario a buscar
 
         Returns:
             Optional[User]: Usuario encontrado o None si no existe
@@ -107,10 +107,10 @@ class UserRepository:
             CustomException: Si hay un error al obtener el usuario
         """
         try:
-            logger.info(f"Buscando usuario con email: {email}")
-            user_entity = self.session.query(UserEntity).filter(UserEntity.email == email).first()
+            logger.info(f"Buscando usuario con nombre de usuario: {username}")
+            user_entity = self.session.query(UserEntity).filter(UserEntity.username == username).first()
             if not user_entity:
-                logger.info(f"Usuario con email {email} no encontrado")
+                logger.info(f"Usuario con nombre de usuario {username} no encontrado")
                 return None
             return map_entity_to_user(user_entity)
         except SQLAlchemyError as e:

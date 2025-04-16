@@ -29,7 +29,7 @@ def map_entity_to_user(user_entity: UserEntity) -> User:
     """
     return User(
         id=user_entity.id,
-        email=user_entity.email,
+        username=user_entity.username,
         password=user_entity.password,
         creation_date=str(user_entity.creation_date),
         profile_id=user_entity.profile_id,
@@ -49,8 +49,8 @@ def map_update_to_entity(user_update: User, user_entity: UserEntity) -> UserEnti
         UserEntity: Entidad de usuario actualizada
     """
     user_entity.id = user_update.id
-    if user_update.email:
-        user_entity.email = user_update.email
+    if user_update.username:
+        user_entity.username = user_update.username
     if user_update.password:
         user_entity.password = user_update.password
     if user_update.profile_id is not None and user_update.profile_id != 0:

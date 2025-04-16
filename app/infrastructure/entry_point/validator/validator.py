@@ -1,7 +1,4 @@
-from typing import Final
-import re
 
-from pydantic import ValidationError, EmailStr
 from app.infrastructure.entry_point.dto.user_dto import (
     NewUserInput,
     GetUser,
@@ -10,19 +7,20 @@ from app.infrastructure.entry_point.dto.user_dto import (
 )
 
 
-def is_valid_email(email: str) -> bool:
+def is_valid_username(username: str) -> bool:
     """
-    Valida el formato de un correo electrónico de manera más flexible.
+    Valida el formato de un nombre de usuario de manera más flexible.
     
     Args:
-        email: Correo electrónico a validar
+        username: Nombre de usuario a validar
         
     Returns:
         bool: True si el formato es válido
     """
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return bool(re.match(pattern, email))
-
+    length = len(username)
+    if length < 3 or length > 20:
+        return False
+    return True
 
 def validate_new_user(user: NewUserInput) -> bool:
     """
@@ -37,11 +35,11 @@ def validate_new_user(user: NewUserInput) -> bool:
     Raises:
         ValueError: Si los datos no son válidos
     """
-    if not user.email:
-        raise ValueError("El correo electrónico es obligatorio")
+    if not user.username:
+        raise ValueError("El nombre de usuario es obligatorio")
     
-    if not is_valid_email(user.email):
-        raise ValueError("El formato del correo electrónico no es válido")
+    if not is_valid_username(user.username):
+        raise ValueError("El formato del nombre de usuario no es válido")
     
     if not user.password or len(user.password) < 8:
         raise ValueError("La contraseña debe tener al menos 8 caracteres")
@@ -68,11 +66,11 @@ def validate_get_user(user: GetUser) -> bool:
     Raises:
         ValueError: Si los datos no son válidos
     """
-    if not user.id and not user.email:
-        raise ValueError("Debe proporcionar un ID o correo electrónico")
+    if not user.id and not user.username:
+        raise ValueError("Debe proporcionar un ID o nombre de usuario")
     
-    if user.email and not is_valid_email(user.email):
-        raise ValueError("El formato del correo electrónico no es válido")
+    if user.username and not is_valid_username(user.username):
+        raise ValueError("El formato del nombre de usuario no es válido")
     
     return True
 
@@ -90,11 +88,11 @@ def validate_login(user: LoginInput) -> bool:
     Raises:
         ValueError: Si los datos no son válidos
     """
-    if not user.email:
-        raise ValueError("El correo electrónico es obligatorio")
+    if not user.username:
+        raise ValueError("El nombre de usuario es obligatorio")
     
-    if not is_valid_email(user.email):
-        raise ValueError("El formato del correo electrónico no es válido")
+    if not is_valid_username(user.username):
+        raise ValueError("El formato del nombre de usuario no es válido")
     
     if not user.password or len(user.password) < 8:
         raise ValueError("La contraseña debe tener al menos 8 caracteres")
@@ -118,8 +116,8 @@ def validate_update_user(user: UpdateUserInput) -> bool:
     if not user.id or user.id <= 0:
         raise ValueError("El ID del usuario es obligatorio y debe ser mayor que 0")
     
-    if user.email and not is_valid_email(user.email):
-        raise ValueError("El formato del correo electrónico no es válido")
+    if user.username and not is_valid_username(user.username):
+        raise ValueError("El formato del nombre de usuario no es válido")
     
     if user.password and len(user.password) < 8:
         raise ValueError("La contraseña debe tener al menos 8 caracteres")
