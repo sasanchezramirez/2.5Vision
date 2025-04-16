@@ -44,7 +44,7 @@ class AuthUseCase:
         try:
             user_validated = self.get_user(user)
             if user and verify_password(user.password, user_validated.password):
-                return create_access_token({"sub": user.email})
+                return create_access_token({"sub": user.username})
             return None
         except CustomException as e:
             logger.error(f"Error de autenticación: {e}")
@@ -55,10 +55,10 @@ class AuthUseCase:
 
     def get_user(self, user_to_get: User) -> User:
         """
-        Obtiene un usuario por su correo electrónico.
+        Obtiene un usuario por su nombre de usuario.
 
         Args:
-            user_to_get: Usuario con el correo electrónico a buscar
+            user_to_get: Usuario con el nombre de usuario a buscar
 
         Returns:
             User: Usuario encontrado
@@ -66,9 +66,9 @@ class AuthUseCase:
         Raises:
             CustomException: Si hay un error al obtener el usuario
         """
-        logger.info("Iniciando búsqueda de usuario por correo electrónico")
+        logger.info("Iniciando búsqueda de usuario por nombre de usuario")
         try:
-            return self.persistence_gateway.get_user_by_email(user_to_get.email)
+            return self.persistence_gateway.get_user_by_username(user_to_get.username)
         except CustomException as e:
             logger.error(f"Error al obtener usuario: {e}")
             raise

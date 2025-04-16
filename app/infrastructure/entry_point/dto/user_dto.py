@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from typing import Optional
 
 
@@ -6,9 +6,9 @@ class NewUserInput(BaseModel):
     """
     DTO para la creación de un nuevo usuario.
     """
-    email: EmailStr = Field(
-        description="Correo electrónico del usuario",
-        example="usuario@ejemplo.com"
+    username: str = Field(
+        description="Nombre de usuario del usuario",
+        example="usuario"
     )
     password: str = Field(
         description="Contraseña del usuario",
@@ -35,9 +35,9 @@ class UserOutput(BaseModel):
         description="Identificador único del usuario",
         example=1
     )
-    email: EmailStr = Field(
-        description="Correo electrónico del usuario",
-        example="usuario@ejemplo.com"
+    username: str = Field(
+        description="Nombre de usuario del usuario",
+        example="usuario"
     )
     creation_date: str = Field(
         description="Fecha de creación del usuario",
@@ -62,17 +62,17 @@ class GetUser(BaseModel):
         description="ID del usuario a buscar",
         example=1
     )
-    email: Optional[str] = Field(
+    username: Optional[str] = Field(
         default=None,
-        description="Correo electrónico del usuario a buscar",
-        example="usuario@ejemplo.com"
+        description="Nombre de usuario del usuario a buscar",
+        example="usuario"
     )
 
     def __init__(self, **data):
         super().__init__(**data)
-        # Si el email está vacío, lo convertimos a None
-        if self.email == "":
-            self.email = None
+        # Si el username está vacío, lo convertimos a None
+        if self.username == "":
+            self.username = None
 
 
 class Token(BaseModel):
@@ -94,9 +94,9 @@ class LoginInput(BaseModel):
     """
     DTO para el inicio de sesión.
     """
-    email: EmailStr = Field(
-        description="Correo electrónico del usuario",
-        example="usuario@ejemplo.com"
+    username: str = Field(
+        description="Nombre de usuario del usuario",
+        example="usuario"
     )
     password: str = Field(
         description="Contraseña del usuario",
@@ -114,10 +114,10 @@ class UpdateUserInput(BaseModel):
         gt=0,
         example=1
     )
-    email: Optional[EmailStr] = Field(
+    username: Optional[str] = Field(
         default=None,
-        description="Nuevo correo electrónico del usuario",
-        example="nuevo@ejemplo.com"
+        description="Nuevo nombre de usuario del usuario",
+        example="nuevoUsuario"
     )
     password: Optional[str] = Field(
         default=None,

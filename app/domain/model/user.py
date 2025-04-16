@@ -1,6 +1,5 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from typing import Optional
-from datetime import datetime
 
 
 class User(BaseModel):
@@ -16,9 +15,9 @@ class User(BaseModel):
         description="Identificador único del usuario"
     )
     
-    email: EmailStr = Field(
-        description="Correo electrónico del usuario",
-        example="usuario@ejemplo.com"
+    username: str = Field(
+        description="Nombre de usuario del usuario",
+        example="usuario"
     )
     
     password: Optional[str] = Field(
@@ -50,7 +49,7 @@ class User(BaseModel):
         json_schema_extra = {
             "example": {
                 "id": 1,
-                "email": "usuario@ejemplo.com",
+                "username": "usuario",
                 "creation_date": "2024-03-27T12:00:00",
                 "profile_id": 1,
                 "status_id": 1
