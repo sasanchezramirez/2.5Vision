@@ -89,4 +89,14 @@ class PersistenceGateway(ABC):
             ImageMetadata: Metadato de imagen creado
         """
         pass    
+
+    @abstractmethod
+    def get_total_images_uploaded(self) -> int:
+        """
+        Obtiene el total de imágenes subidas por los usuarios.
+
+        Returns:
+            int: Total de imágenes subidas
+        """
+        pass
     

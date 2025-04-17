@@ -6,6 +6,7 @@ from app.application.handler import Handlers
 from app.domain.usecase.user_usecase import UserUseCase
 from app.domain.usecase.auth_usecase import AuthUseCase
 from app.domain.usecase.image_usecase import ImageUseCase
+from app.domain.usecase.masterdata_usecase import MasterdataUseCase
 from app.infrastructure.driven_adapter.persistence.service.persistence import Persistence
 from app.infrastructure.driven_adapter.persistence.config.database import SessionLocal
 from app.infrastructure.driven_adapter.siata.service.siata_service import SiataService
@@ -64,6 +65,11 @@ class Container(containers.DeclarativeContainer):
     
     auth_usecase: Final = providers.Factory(
         AuthUseCase,
+        persistence_gateway=persistence_gateway
+    )
+
+    masterdata_usecase: Final = providers.Factory(
+        MasterdataUseCase,
         persistence_gateway=persistence_gateway
     )
 
