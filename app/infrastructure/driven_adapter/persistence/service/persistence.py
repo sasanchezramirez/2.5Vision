@@ -14,7 +14,7 @@ import app.infrastructure.driven_adapter.persistence.mapper.user_mapper as mappe
 from app.infrastructure.driven_adapter.persistence.mapper.image_mapper import ImageMapper
 from app.domain.model.image_metadata import ImageMetadata
 from app.infrastructure.driven_adapter.persistence.repository.image_repository import ImageRepository
-
+from app.infrastructure.driven_adapter.persistence.repository.masterdata_repository import MasterdataRepository
 logger: Final = logging.getLogger("Persistence")
 
 class Persistence(PersistenceGateway):
@@ -40,6 +40,7 @@ class Persistence(PersistenceGateway):
         self.session: Final[Session] = session
         self.user_repository: Final[UserRepository] = UserRepository(session)
         self.image_repository: Final[ImageRepository] = ImageRepository(session)
+        self.masterdata_repository: Final[MasterdataRepository] = MasterdataRepository(session)
 
     def create_user(self, user: User) -> User:
         """
@@ -172,3 +173,22 @@ class Persistence(PersistenceGateway):
             return image_metadata
         except CustomException as e:
             self.session.rollback()
+            raise e
+        except SQLAlchemyError as e:
+            logger.error(f"Error al crear metadatos de imagen: {e}")
+            self.session.rollback()
+            raise CustomException(ResponseCodeEnum.KOG02)
+
+    def get_total_images_uploaded(self) -> int:
+        """
+        Obtiene el total de imágenes subidas por los usuarios.
+
+        Returns:
+            int: Total de imágenes subidas
+        """
+        try:
+            return self.masterdata_repository.get_total_images_uploaded()
+        except SQLAlchemyError as e:
+            logger.error(f"Error al obtener el total de imágenes subidas: {e}")
+            self.session.rollback()
+            raise CustomException(ResponseCodeEnum.KOG02)

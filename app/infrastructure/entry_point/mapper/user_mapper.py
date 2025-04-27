@@ -25,7 +25,8 @@ def map_user_dto_to_user(user_dto: NewUserInput) -> User:
         password=user_dto.password,
         profile_id=user_dto.profile_id,
         status_id=user_dto.status_id,
-        creation_date=datetime.now().isoformat()
+        creation_date=datetime.now().isoformat(),
+        contact_info=user_dto.contact_info
     )
 
 

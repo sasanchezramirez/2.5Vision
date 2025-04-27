@@ -42,6 +42,12 @@ class User(BaseModel):
         description="Identificador del estado del usuario",
         gt=0
     )
+   
+    contact_info: Optional[str] = Field(
+        default=None,
+        description="Información de contacto del usuario",
+        example="usuario@example.com"
+    )
 
     class Config:
         """

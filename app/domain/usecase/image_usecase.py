@@ -191,17 +191,28 @@ class ImageUseCase:
         try:
             gps = image_metadata["GPSInfo"]
         except KeyError:
+            return GPS(latitude=None, longitude=None, zone=0)
+            
+        try:
+            gps_latitude = gps["GPSLatitude"]
+            gps_latitude_ref = gps["GPSLatitudeRef"]
+            gps_longitude = gps["GPSLongitude"]
+            gps_longitude_ref = gps["GPSLongitudeRef"]
+            
+            latitude = GeolocalizationUtils.dms_to_decimal(gps_latitude, gps_latitude_ref)
+            longitude = GeolocalizationUtils.dms_to_decimal(gps_longitude, gps_longitude_ref)
+            
+            if latitude is None or longitude is None:
+                logger.warning("Coordenadas GPS inválidas en la imagen")
                 return GPS(latitude=None, longitude=None, zone=0)
-        gps_latitude = gps["GPSLatitude"]
-        gps_latitude_ref = gps["GPSLatitudeRef"]
-        gps_longitude = gps["GPSLongitude"]
-        gps_longitude_ref = gps["GPSLongitudeRef"]
-        latitude = GeolocalizationUtils.dms_to_decimal(gps_latitude, gps_latitude_ref)
-        longitude = GeolocalizationUtils.dms_to_decimal(gps_longitude, gps_longitude_ref)        
-        gps_obj = GPS(latitude=latitude, longitude=longitude, zone=0)
-        zone = self.zone_dictionary.get_zone(gps_obj)
-        logger.info(f"Zona geográfica obtenida: {zone}, para la latitud: {latitude} y la longitud: {longitude}")
-        return GPS(latitude=latitude, longitude=longitude, zone=zone)
+                
+            gps_obj = GPS(latitude=latitude, longitude=longitude, zone=0)
+            zone = self.zone_dictionary.get_zone(gps_obj)
+            logger.info(f"Zona geográfica obtenida: {zone}, para la latitud: {latitude} y la longitud: {longitude}")
+            return GPS(latitude=latitude, longitude=longitude, zone=zone)
+        except (KeyError, ValueError, TypeError, ZeroDivisionError) as e:
+            logger.warning(f"Error al procesar datos GPS: {str(e)}")
+            return GPS(latitude=None, longitude=None, zone=0)
     
     def _get_pm_data(self, gps_data: GPS) -> list[DataSensor]:
         """

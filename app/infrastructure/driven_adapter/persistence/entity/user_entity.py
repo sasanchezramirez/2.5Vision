@@ -23,9 +23,9 @@ class UserEntity(Base):
     creation_date: str = Column(String, nullable=False)
     profile_id: Optional[int] = Column(Integer, nullable=True)
     status_id: Optional[int] = Column(Integer, nullable=True)
-
+    contact_info: Optional[str] = Column(String, nullable=True)
     def __init__(self, username: str, password: str, creation_date: str, 
-                 profile_id: Optional[int] = None, status_id: Optional[int] = None) -> None:
+                 profile_id: Optional[int] = None, status_id: Optional[int] = None, contact_info: Optional[str] = None) -> None:
         """
         Inicializa una entidad de usuario.
 
@@ -35,12 +35,14 @@ class UserEntity(Base):
             creation_date: Fecha de creación del usuario
             profile_id: ID del perfil del usuario (opcional)
             status_id: ID del estado del usuario (opcional)
+            contact_info: Información de contacto del usuario (opcional)
         """
         self.username = username
         self.password = password
         self.creation_date = creation_date
         self.profile_id = profile_id
         self.status_id = status_id
+        self.contact_info = contact_info
 
     @classmethod
     def from_user(cls, user: User) -> 'UserEntity':
@@ -58,7 +60,8 @@ class UserEntity(Base):
             password=user.password or "",  # Si no hay contraseña, usar cadena vacía
             creation_date=user.creation_date,
             profile_id=user.profile_id,
-            status_id=user.status_id
+            status_id=user.status_id,
+            contact_info=user.contact_info
         )
 
     def __repr__(self) -> str:

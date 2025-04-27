@@ -1,0 +1,53 @@
+import logging
+from typing import Final
+
+from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
+from dependency_injector.wiring import inject, Provide
+
+from app.application.container import Container
+from app.domain.model.util.custom_exceptions import CustomException
+from app.domain.model.util.response_codes import ResponseCodeEnum
+from app.infrastructure.entry_point.dto.response_dto import ResponseDTO
+from app.infrastructure.entry_point.utils.api_response import ApiResponse
+from app.domain.usecase.masterdata_usecase import MasterdataUseCase
+
+logger: Final[logging.Logger] = logging.getLogger("Masterdata Handler")
+
+router: Final[APIRouter] = APIRouter(
+    prefix='/masterdata',
+    tags=['masterdata'],
+    responses={
+        
+    }
+)
+
+@router.get('/total-images-uploaded', response_model=ResponseDTO)
+@inject
+async def get_total_images_uploaded(
+    masterdata_usecase: MasterdataUseCase = Depends(Provide[Container.masterdata_usecase])
+) -> JSONResponse:
+    """
+    Obtiene el total de imágenes subidas por los usuarios.
+
+    Returns:
+        JSONResponse: Respuesta con el total de imágenes subidas
+    """
+    logger.info("Iniciando obtención del total de imágenes subidas")
+    try:
+        total_images = masterdata_usecase.get_total_images_uploaded()
+        return JSONResponse(
+            status_code=200,
+            content=ApiResponse.create_response(ResponseCodeEnum.KO000, total_images)
+        )
+    except CustomException as e:
+        return JSONResponse(
+            status_code=e.http_status,
+            content=e.to_dict()
+        )
+    except Exception as e:
+        logger.error(f"Excepción no manejada: {e}")
+        return JSONResponse(
+            status_code=500,
+            content=ApiResponse.create_response(ResponseCodeEnum.KOG01)
+        )
