@@ -61,7 +61,7 @@ class MasterdataRepository:
         Obtiene el total de imágenes subidas por un usuario.
 
         Args:
-            username (str): Nombre de usuario a buscar.
+            username (str): Nombre de usuario del usuario a buscar.
 
         Returns:
             int: Total de imágenes subidas

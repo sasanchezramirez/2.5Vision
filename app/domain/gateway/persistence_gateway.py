@@ -117,7 +117,7 @@ class PersistenceGateway(ABC):
         Obtiene el total de imágenes subidas por un usuario.
 
         Args:
-            username: Nombre de usuario a buscar
+            username: Nombre de usuario del usuario a buscar
 
         Returns:
             int: Total de imágenes subidas

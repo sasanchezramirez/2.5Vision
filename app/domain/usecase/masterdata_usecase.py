@@ -36,8 +36,11 @@ class MasterdataUseCase:
     def get_total_images_uploaded_by_user(self, username: str) -> int:
         """
         Obtiene el total de imágenes subidas por un usuario.
-        
         Args:
             username: Nombre de usuario del usuario
+        Returns:
+            int: Total de imágenes subidas
+
         """
+        username = username.lower()
         return self.persistence_gateway.get_total_images_uploaded_by_user(username)
