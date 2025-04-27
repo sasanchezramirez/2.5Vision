@@ -26,7 +26,12 @@ class MasterdataRepository:
             return self.session.query(func.count(ImageMetadataEntity.id)).scalar()
         except SQLAlchemyError as e:
             logger.error(f"Error al obtener el total de imágenes subidas: {e}")
+            self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
+        except Exception as e:
+            logger.error(f"Error no manejado al obtener el total de imágenes subidas: {e}")
+            self.session.rollback()
+            raise CustomException(ResponseCodeEnum.KOG01)
         
     def get_top_users_by_images_uploaded(self) -> List[Tuple[UserEntity, int]]:
         """
@@ -54,7 +59,12 @@ class MasterdataRepository:
             return query_result
         except SQLAlchemyError as e:
             logger.error(f"Error al obtener los usuarios con más imágenes subidas: {e}")
+            self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
+        except Exception as e:
+            logger.error(f"Error no manejado al obtener los usuarios con más imágenes subidas: {e}")
+            self.session.rollback()
+            raise CustomException(ResponseCodeEnum.KOG01)
     
     def get_total_images_uploaded_by_user(self, username: str) -> int:
         """
@@ -70,4 +80,9 @@ class MasterdataRepository:
             return self.session.query(func.count(ImageMetadataEntity.id)).filter(ImageMetadataEntity.uploader_username == username).scalar()
         except SQLAlchemyError as e:
             logger.error(f"Error al obtener el total de imágenes subidas por usuario: {e}")
+            self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
+        except Exception as e:
+            logger.error(f"Error no manejado al obtener el total de imágenes subidas por usuario: {e}")
+            self.session.rollback()
+            raise CustomException(ResponseCodeEnum.KOG01)
