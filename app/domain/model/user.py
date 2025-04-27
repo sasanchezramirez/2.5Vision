@@ -62,3 +62,50 @@ class User(BaseModel):
                 "status_id": 1
             }
         }
+
+class UserContribution(BaseModel):
+    """
+    Modelo de dominio para representar la contribución de un usuario en el sistema.
+    """
+    id: int = Field(
+        description="Identificador único del usuario"
+    )
+    username: str = Field(
+        description="Nombre de usuario del usuario"
+    )
+    total_images_uploaded: int = Field(
+        description="Total de imágenes subidas por el usuario"
+    )
+
+    def model_dump(self) -> dict:
+        """
+        Convierte el modelo a un diccionario serializable.
+        
+        Returns:
+            dict: Diccionario con los datos del modelo
+        """
+        return {
+            "id": self.id,
+            "username": self.username,
+            "total_images_uploaded": self.total_images_uploaded
+        }
+
+    # Para compatibilidad con versiones anteriores
+    def dict(self) -> dict:
+        """
+        Alias para model_dump para compatibilidad con Pydantic v1.
+        """
+        return self.model_dump()
+
+    class Config:
+        """
+        Configuración del modelo Pydantic.
+        """
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "username": "usuario",
+                "total_images_uploaded": 10
+            }
+        }
+        

@@ -28,16 +28,22 @@ class ApiResponse:
     @staticmethod
     def _convert_datetime_to_string(obj: Any) -> Any:
         """
-        Convierte recursivamente cualquier objeto datetime a string ISO.
+        Convierte recursivamente cualquier objeto datetime a string ISO y objetos Pydantic a diccionarios.
         
         Args:
-            obj: Objeto que puede contener datetimes
+            obj: Objeto que puede contener datetimes o modelos Pydantic
             
         Returns:
-            El mismo objeto con los datetimes convertidos a strings
+            El mismo objeto con los datetimes convertidos a strings y modelos Pydantic a diccionarios
         """
         if isinstance(obj, datetime):
             return obj.isoformat()
+        elif hasattr(obj, 'model_dump') and callable(getattr(obj, 'model_dump')):
+            # Es un modelo Pydantic v2
+            return ApiResponse._convert_datetime_to_string(obj.model_dump())
+        elif hasattr(obj, 'dict') and callable(getattr(obj, 'dict')):
+            # Es un modelo Pydantic v1
+            return ApiResponse._convert_datetime_to_string(obj.dict())
         elif isinstance(obj, dict):
             return {k: ApiResponse._convert_datetime_to_string(v) for k, v in obj.items()}
         elif isinstance(obj, list):
