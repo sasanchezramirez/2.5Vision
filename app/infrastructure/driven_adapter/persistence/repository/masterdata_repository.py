@@ -36,7 +36,6 @@ class MasterdataRepository:
             List[Tuple[UserEntity, int]]: Lista de tuplas con usuario y cantidad de imágenes subidas
         """
         try:
-            # Realizar una consulta que cuente las imágenes por usuario y ordene por cantidad
             query_result = (
                 self.session.query(
                     UserEntity, 

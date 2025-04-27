@@ -193,24 +193,7 @@ class Persistence(PersistenceGateway):
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
         
-    def get_top_users_by_images_uploaded(self) -> list[User]:
-        """
-        Obtiene los usuarios con más imágenes subidas.
-        
-        Returns:
-            list[User]: Lista de usuarios con más imágenes subidas
-        """
-        try:
-            result = self.masterdata_repository.get_top_users_by_images_uploaded()
-            users = []
-            for user_entity, total_images in result:
-                user = mapper.map_entity_to_user(user_entity)
-                users.append(user)
-            return users
-        except SQLAlchemyError as e:
-            logger.error(f"Error al obtener los usuarios con más imágenes subidas: {e}")
-            self.session.rollback()
-            raise CustomException(ResponseCodeEnum.KOG02)
+ 
     
     def get_top_users_by_images_uploaded_with_count(self) -> list[tuple[User, int]]:
         """

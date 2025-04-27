@@ -23,7 +23,6 @@ class MasterdataUseCase:
         result = self.persistence_gateway.get_top_users_by_images_uploaded_with_count()
         top_users_contribution = []
         
-        # El repositorio ahora devuelve los usuarios con su conteo de imágenes
         for user, total_images in result:
             top_users_contribution.append(
                 UserContribution(

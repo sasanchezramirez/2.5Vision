@@ -100,15 +100,6 @@ class PersistenceGateway(ABC):
         """
         pass
 
-    @abstractmethod
-    def get_top_users_by_images_uploaded(self) -> list[User]:
-        """
-        Obtiene los usuarios con más imágenes subidas.
-
-        Returns:
-            list[User]: Lista de usuarios con más imágenes subidas  
-        """
-        pass
     
     @abstractmethod
     def get_top_users_by_images_uploaded_with_count(self) -> list[tuple[User, int]]:
