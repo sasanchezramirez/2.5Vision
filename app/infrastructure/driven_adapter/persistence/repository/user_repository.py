@@ -52,6 +52,7 @@ class UserRepository:
             return map_entity_to_user(user_entity)
         except IntegrityError as e:
             logger.error(f"Error de integridad: {e}")
+            self.session.rollback()
             if "llave duplicada" in str(e.orig) or "duplicate key" in str(e.orig):
                 raise CustomException(ResponseCodeEnum.KOU01)
             elif "viola la llave" in str(e.orig) or "key violation" in str(e.orig):
@@ -62,9 +63,11 @@ class UserRepository:
             raise CustomException(ResponseCodeEnum.KOG02)
         except SQLAlchemyError as e:
             logger.error(f"Error de base de datos: {e}")
+            self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
         except Exception as e:
             logger.error(f"Error no manejado: {e}")
+            self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG01)
 
     def get_user_by_id(self, id: int) -> Optional[User]:
@@ -88,9 +91,11 @@ class UserRepository:
             return map_entity_to_user(user_entity)
         except SQLAlchemyError as e:
             logger.error(f"Error de base de datos: {e}")
+            self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
         except Exception as e:
             logger.error(f"Error no manejado: {e}")
+            self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG01)
 
     def get_user_by_username(self, username: str) -> Optional[User]:
@@ -115,9 +120,11 @@ class UserRepository:
             return map_entity_to_user(user_entity)
         except SQLAlchemyError as e:
             logger.error(f"Error de base de datos: {e}")
+            self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
         except Exception as e:
             logger.error(f"Error no manejado: {e}")
+            self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG01)
 
     def update_user(self, user: User) -> User:
@@ -148,7 +155,9 @@ class UserRepository:
             return map_entity_to_user(user_entity)
         except SQLAlchemyError as e:
             logger.error(f"Error de base de datos: {e}")
+            self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
         except Exception as e:
             logger.error(f"Error no manejado: {e}")
+            self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG01)

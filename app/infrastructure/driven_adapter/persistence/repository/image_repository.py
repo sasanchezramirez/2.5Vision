@@ -38,7 +38,12 @@ class ImageRepository:
             self.session.commit()
         except SQLAlchemyError as e:
             logger.error(f"Error al crear metadato de imagen: {e}")
+            self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
+        except Exception as e:
+            logger.error(f"Error no manejado al crear metadato de imagen: {e}")
+            self.session.rollback()
+            raise CustomException(ResponseCodeEnum.KOG01)
         
         
         

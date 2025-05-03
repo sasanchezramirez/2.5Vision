@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from app.domain.model.user import User
+from app.domain.model.user import User, UserContribution
 from app.domain.model.image_metadata import ImageMetadata
 
 class PersistenceGateway(ABC):
@@ -99,4 +99,27 @@ class PersistenceGateway(ABC):
             int: Total de imágenes subidas
         """
         pass
+
     
+    @abstractmethod
+    def get_top_users_by_images_uploaded_with_count(self) -> list[tuple[User, int]]:
+        """
+        Obtiene los usuarios con más imágenes subidas junto con el conteo de imágenes.
+
+        Returns:
+            list[tuple[User, int]]: Lista de tuplas con usuario y cantidad de imágenes subidas
+        """
+        pass
+    
+    @abstractmethod
+    def get_total_images_uploaded_by_user(self, username: str) -> int:
+        """
+        Obtiene el total de imágenes subidas por un usuario.
+
+        Args:
+            username: Nombre de usuario del usuario a buscar
+
+        Returns:
+            int: Total de imágenes subidas
+        """
+        pass

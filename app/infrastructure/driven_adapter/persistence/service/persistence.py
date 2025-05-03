@@ -192,3 +192,41 @@ class Persistence(PersistenceGateway):
             logger.error(f"Error al obtener el total de imágenes subidas: {e}")
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
+        
+ 
+    
+    def get_top_users_by_images_uploaded_with_count(self) -> list[tuple[User, int]]:
+        """
+        Obtiene los usuarios con más imágenes subidas junto con el conteo de imágenes.
+
+        Returns:
+            list[tuple[User, int]]: Lista de tuplas con usuario y cantidad de imágenes
+        """
+        try:
+            result = self.masterdata_repository.get_top_users_by_images_uploaded()
+            users_with_count = []
+            for user_entity, total_images in result:
+                user = mapper.map_entity_to_user(user_entity)
+                users_with_count.append((user, total_images))
+            return users_with_count
+        except SQLAlchemyError as e:
+            logger.error(f"Error al obtener los usuarios con más imágenes subidas y su conteo: {e}")
+            self.session.rollback()
+            raise CustomException(ResponseCodeEnum.KOG02)
+    
+    def get_total_images_uploaded_by_user(self, username: str) -> int:
+        """
+        Obtiene el total de imágenes subidas por un usuario.
+
+        Args:
+            username (str): Nombre de usuario del usuario a buscar.
+
+        Returns:
+            int: Total de imágenes subidas
+        """
+        try:
+            return self.masterdata_repository.get_total_images_uploaded_by_user(username)
+        except SQLAlchemyError as e:
+            logger.error(f"Error al obtener el total de imágenes subidas por usuario: {e}")
+            self.session.rollback()
+            raise CustomException(ResponseCodeEnum.KOG02)   
