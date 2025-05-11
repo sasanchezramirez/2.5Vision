@@ -95,13 +95,6 @@ class ImageUseCase:
             return image_metadata
         except Exception as e:
             logger.error(f"Error en el flujo de carga de imágenes: {str(e)}")
-            if hasattr(image_metadata, 'image_url') and image_metadata.image_url:
-                try:
-                    # Esta limpieza se podría hacer asíncrona también
-                    # O implementar un proceso de limpieza periódico para imágenes huérfanas
-                    pass
-                except Exception as cleanup_error:
-                    logger.error(f"Error en limpieza post-fallo: {str(cleanup_error)}")
             raise
     
     def _image_normalization(self, image: Image, image_config_metadata: ImageConfigMetadata) -> Image:
