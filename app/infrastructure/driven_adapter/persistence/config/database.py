@@ -49,6 +49,21 @@ def retry_on_db_error(
                     await asyncio.sleep(delay)
                     delay = min(delay * backoff_factor, max_delay)
                 except SQLAlchemyError as e:
+                    # Manejar errores específicos de tipos PostgreSQL
+                    if "Unknown PG numeric type: 25" in str(e):
+                        logger.warning(f"Error de tipo PostgreSQL (intento {attempt + 1}/{max_retries + 1})")
+                        
+                        # Si es el último intento, propagar el error
+                        if attempt == max_retries:
+                            logger.error(f"Error de tipo PostgreSQL después de {max_retries} reintentos: {str(e)}")
+                            raise
+                        
+                        # Esperar más tiempo para estos errores específicos y reintentar
+                        await asyncio.sleep(delay * 1.5)
+                        delay = min(delay * backoff_factor * 1.5, max_delay)
+                        continue
+                        
+                    # Otros errores de SQLAlchemy no son recuperables
                     logger.error(f"Error de SQLAlchemy no recuperable: {str(e)}")
                     raise
                 
@@ -61,9 +76,17 @@ SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
     pool_pre_ping=True,  # Verifica conexiones antes de usarlas
-    pool_recycle=3600,   # Recicla conexiones después de una hora
+    pool_recycle=1800,   # Recicla conexiones después de 30 minutos
     pool_size=10,        # Tamaño del pool de conexiones
-    max_overflow=20      # Conexiones adicionales permitidas
+    max_overflow=20,     # Conexiones adicionales permitidas
+    pool_timeout=30,     # Tiempo de espera máximo para obtener una conexión del pool
+    connect_args={
+        "connect_timeout": 10,      # Tiempo máximo de espera para conectar
+        "keepalives": 1,            # Mantener conexiones vivas
+        "keepalives_idle": 60,      # Tiempo de inactividad antes de enviar keepalive
+        "keepalives_interval": 10,  # Intervalo entre keepalives
+        "keepalives_count": 3       # Número de keepalives fallidos antes de cerrar
+    }
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
