@@ -71,25 +71,31 @@ class ImageUseCase:
         Returns:
             dict: Información sobre la imagen subida (URL, nombre, tipo, tamaño)
         """
-        logger.info("Inicia el flujo de carga de imágenes")
-        image_pilow = await ImageProcessingUtils.format_upload_file_to_image(file)
-        gps_data = self._get_gps_data(image_pilow)
-        if gps_data.latitude or gps_data.longitude: 
-            has_metadata = True
-            image_metadata.latitude = gps_data.latitude
-            image_metadata.longitude = gps_data.longitude
-        else:
-            has_metadata = False
-            image_metadata.latitude = None
-            image_metadata.longitude = None
-        image_config_metadata = self._get_image_configuration_metadata(image_pilow)
-        normalized_image = self._image_normalization(image_pilow, image_config_metadata)
-        file_details = self.s3_gateway.upload_image(normalized_image, has_metadata)
-        image_metadata.image_url = file_details.image_url
-        image_metadata.image_name = file_details.image_name
-        self.persistence_gateway.create_image_metadata(image_metadata)
-        logger.info(f"Imagen subida a S3 y metadatos guardados en la base de datos: {image_metadata.image_url}")
-        return image_metadata
+        try:
+            logger.info("Inicia el flujo de carga de imágenes")
+            image_pilow = await ImageProcessingUtils.format_upload_file_to_image(file)
+            gps_data = self._get_gps_data(image_pilow)
+            if gps_data.latitude or gps_data.longitude: 
+                has_metadata = True
+                image_metadata.latitude = gps_data.latitude
+                image_metadata.longitude = gps_data.longitude
+            else:
+                has_metadata = False
+                image_metadata.latitude = None
+                image_metadata.longitude = None
+            image_config_metadata = self._get_image_configuration_metadata(image_pilow)
+            normalized_image = self._image_normalization(image_pilow, image_config_metadata)
+            
+            file_details = await self.s3_gateway.upload_image_async(normalized_image, has_metadata)
+            image_metadata.image_url = file_details.image_url
+            image_metadata.image_name = file_details.image_name
+            
+            await self.persistence_gateway.create_image_metadata(image_metadata)
+            logger.info(f"Imagen subida a S3 y metadatos guardados en la base de datos: {image_metadata.image_url}")
+            return image_metadata
+        except Exception as e:
+            logger.error(f"Error en el flujo de carga de imágenes: {str(e)}")
+            raise
     
     def _image_normalization(self, image: Image, image_config_metadata: ImageConfigMetadata) -> Image:
         """

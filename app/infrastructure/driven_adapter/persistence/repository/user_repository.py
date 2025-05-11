@@ -9,6 +9,7 @@ from app.infrastructure.driven_adapter.persistence.entity.user_entity import Use
 from app.domain.model.user import User
 from app.domain.model.util.response_codes import ResponseCodeEnum
 from app.domain.model.util.custom_exceptions import CustomException
+from app.infrastructure.driven_adapter.persistence.config.database import retry_on_db_error
 
 
 logger: Final[logging.Logger] = logging.getLogger("User Repository")
@@ -31,7 +32,8 @@ class UserRepository:
         """
         self.session: Final[Session] = session
 
-    def create_user(self, user: User) -> User:
+    @retry_on_db_error(max_retries=3, initial_delay=1.0, max_delay=10.0)
+    async def create_user(self, user: User) -> User:
         """
         Crea un nuevo usuario en la base de datos.
 
@@ -70,7 +72,8 @@ class UserRepository:
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG01)
 
-    def get_user_by_id(self, id: int) -> Optional[User]:
+    @retry_on_db_error(max_retries=3, initial_delay=1.0, max_delay=10.0)
+    async def get_user_by_id(self, id: int) -> Optional[User]:
         """
         Obtiene un usuario por su ID.
 
@@ -98,7 +101,8 @@ class UserRepository:
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG01)
 
-    def get_user_by_username(self, username: str) -> Optional[User]:
+    @retry_on_db_error(max_retries=3, initial_delay=1.0, max_delay=10.0)
+    async def get_user_by_username(self, username: str) -> Optional[User]:
         """
         Obtiene un usuario por su nombre de usuario.
 
@@ -127,7 +131,8 @@ class UserRepository:
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG01)
 
-    def update_user(self, user: User) -> User:
+    @retry_on_db_error(max_retries=3, initial_delay=1.0, max_delay=10.0)
+    async def update_user(self, user: User) -> User:
         """
         Actualiza un usuario existente.
 

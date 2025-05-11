@@ -35,7 +35,7 @@ async def get_total_images_uploaded(
     """
     logger.info("Iniciando obtención del total de imágenes subidas")
     try:
-        total_images = masterdata_usecase.get_total_images_uploaded()
+        total_images = await masterdata_usecase.get_total_images_uploaded()
         return JSONResponse(
             status_code=200,
             content=ApiResponse.create_response(ResponseCodeEnum.KO000, total_images)
@@ -66,7 +66,7 @@ async def get_top_contributors(
     """
     logger.info("Iniciando obtención de los top 3 contribuyentes con más imágenes subidas")
     try:
-        top_users = masterdata_usecase.get_top_users_by_images_uploaded()
+        top_users = await masterdata_usecase.get_top_users_by_images_uploaded()
         return JSONResponse(
             status_code=200,
             content=ApiResponse.create_response(ResponseCodeEnum.KO000, top_users)
@@ -97,7 +97,7 @@ async def get_total_contributions_by_user(
     """
     logger.info("Iniciando obtención del total de contribuciones por un usuario")
     try:
-        total_contributions = masterdata_usecase.get_total_images_uploaded_by_user(username)
+        total_contributions = await masterdata_usecase.get_total_images_uploaded_by_user(username)
         return JSONResponse(
             status_code=200,
             content=ApiResponse.create_response(ResponseCodeEnum.KO000, total_contributions)

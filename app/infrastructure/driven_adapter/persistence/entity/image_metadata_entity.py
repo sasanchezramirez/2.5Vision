@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Float
+from sqlalchemy import Column, Integer, String, DateTime, Float, Text
 from sqlalchemy.sql import func
 from typing import Optional
 from datetime import datetime
@@ -21,10 +21,10 @@ class ImageMetadataEntity(Base):
     longitude: float = Column(Float, nullable=True)
     datetime_taken: datetime = Column(DateTime, nullable=False)
     visibility_score: int = Column(Integer, nullable=False)
-    weather_tags: Optional[str] = Column(String, nullable=True)
-    uploader_username: Optional[str] = Column(String, nullable=True)
-    image_url: str = Column(String, nullable=False)
-    image_name: str = Column(String, nullable=False)
+    weather_tags: Optional[str] = Column(Text, nullable=True)
+    uploader_username: Optional[str] = Column(Text, nullable=True)
+    image_url: str = Column(Text, nullable=False)
+    image_name: str = Column(Text, nullable=False)
 
     def __init__(self, latitude: float, longitude: float, datetime_taken: datetime, visibility_score: int, weather_tags: Optional[str] = None, uploader_username: Optional[str] = None, image_url: str = "", image_name: str = "") -> None:
         self.latitude = latitude

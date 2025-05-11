@@ -32,7 +32,7 @@ class AuthUseCase:
         """
         self.persistence_gateway: Final[PersistenceGateway] = persistence_gateway
 
-    def authenticate_user(self, user: User) -> Optional[str]:
+    async def authenticate_user(self, user: User) -> Optional[str]:
         """
         Autentica un usuario y genera un token de acceso si las credenciales son válidas.
 
@@ -43,7 +43,7 @@ class AuthUseCase:
             Optional[str]: Token de acceso si la autenticación es exitosa, None en caso contrario
         """
         try:
-            user_validated = self.get_user(user)
+            user_validated = await self.get_user(user)
             try:
                 if user and verify_password(user.password, user_validated.password):
                     return create_access_token({"sub": user.username})
@@ -59,7 +59,7 @@ class AuthUseCase:
             logger.error(f"Error no manejado en autenticación: {e}")
             raise CustomException(ResponseCodeEnum.KOG01)
 
-    def get_user(self, user_to_get: User) -> User:
+    async def get_user(self, user_to_get: User) -> User:
         """
         Obtiene un usuario por su nombre de usuario.
 
@@ -74,7 +74,7 @@ class AuthUseCase:
         """
         logger.info("Iniciando búsqueda de usuario por nombre de usuario")
         try:
-            return self.persistence_gateway.get_user_by_username(user_to_get.username)
+            return await self.persistence_gateway.get_user_by_username(user_to_get.username)
         except CustomException as e:
             logger.error(f"Error al obtener usuario: {e}")
             raise
@@ -82,7 +82,7 @@ class AuthUseCase:
             logger.error(f"Error no manejado al obtener usuario: {e}")
             raise CustomException(ResponseCodeEnum.KOG01)
         
-    def change_password(self, user: User, new_password: str) -> User:
+    async def change_password(self, user: User, new_password: str) -> User:
         """
         Cambia la contraseña de un usuario.
 
@@ -96,7 +96,7 @@ class AuthUseCase:
             CustomException: Si hay un error al cambiar la contraseña
         """
         try:
-            user_validated = self.get_user(user)
+            user_validated = await self.get_user(user)
             if not user_validated:
                 raise CustomException(ResponseCodeEnum.KOU02)
             try:
@@ -107,7 +107,7 @@ class AuthUseCase:
                 raise CustomException(ResponseCodeEnum.KOU03)
             new_password_hashed = hash_password(new_password)
             user_validated.password = new_password_hashed
-            user_saved = self.persistence_gateway.update_user(user_validated)
+            user_saved = await self.persistence_gateway.update_user(user_validated)
             return user_saved
         except CustomException as e:
             logger.error(f"Error al cambiar la contraseña: {e}")

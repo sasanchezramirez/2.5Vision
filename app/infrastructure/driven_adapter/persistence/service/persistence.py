@@ -1,8 +1,10 @@
 import logging
-from typing import Optional, Final
+from typing import Optional, Final, List, Tuple
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+import asyncio
+from sqlalchemy import text
 
 from app.infrastructure.driven_adapter.persistence.entity.user_entity import UserEntity
 from app.infrastructure.driven_adapter.persistence.repository.user_repository import UserRepository
@@ -15,146 +17,106 @@ from app.infrastructure.driven_adapter.persistence.mapper.image_mapper import Im
 from app.domain.model.image_metadata import ImageMetadata
 from app.infrastructure.driven_adapter.persistence.repository.image_repository import ImageRepository
 from app.infrastructure.driven_adapter.persistence.repository.masterdata_repository import MasterdataRepository
+
 logger: Final = logging.getLogger("Persistence")
 
 class Persistence(PersistenceGateway):
     """
-    Implementación del gateway de persistencia que maneja las operaciones de base de datos.
+    Implementación del gateway de persistencia.
     
-    Esta clase implementa la interfaz PersistenceGateway y proporciona métodos para
-    realizar operaciones CRUD en la base de datos utilizando SQLAlchemy.
-    
-    Attributes:
-        session (Session): Sesión de SQLAlchemy para operaciones de base de datos.
-        user_repository (UserRepository): Repositorio para operaciones específicas de usuarios.
+    Esta clase implementa las operaciones de persistencia utilizando
+    SQLAlchemy como ORM.
     """
-    
-    def __init__(self, session: Session) -> None:
-        """
-        Inicializa el servicio de persistencia.
+    def __init__(self, session: Session):
+        self.session = session
+        self.user_repository = UserRepository(session)
+        self.image_repository = ImageRepository(session)
+        self.masterdata_repository = MasterdataRepository(session)
         
-        Args:
-            session (Session): Sesión de SQLAlchemy para operaciones de base de datos.
+    async def __ensure_session_health(self) -> None:
         """
-        logger.info("Inicializando servicio de persistencia")
-        self.session: Final[Session] = session
-        self.user_repository: Final[UserRepository] = UserRepository(session)
-        self.image_repository: Final[ImageRepository] = ImageRepository(session)
-        self.masterdata_repository: Final[MasterdataRepository] = MasterdataRepository(session)
+        Verifica que la sesión esté en buen estado y la reinicia si es necesario. Es un health check
+        """
+        try:
+            self.session.execute(text("SELECT 1")).scalar()
+        except Exception as e:
+            logger.warning(f"Detectado problema de sesión, reiniciando: {e}")
+            self.session.close()
+            await asyncio.sleep(0.5)
 
-    def create_user(self, user: User) -> User:
+    async def create_user(self, user: User) -> User:
         """
         Crea un nuevo usuario en la base de datos.
-        
+
         Args:
-            user (User): Objeto de dominio User a crear.
-            
+            user: Usuario a crear
+
         Returns:
-            User: Usuario creado con su ID asignado.
-            
-        Raises:
-            CustomException: Si hay un error en la validación o en la operación de base de datos.
+            User: Usuario creado con ID asignado
         """
+        await self.__ensure_session_health()
+        logger.info("Inicia el flujo de creación de usuario en base de datos")
         try:
-            # Verificar si el nombre de usuario ya existe
-            existing_user = self.user_repository.get_user_by_username(user.username)
-            if existing_user:
-                raise CustomException(ResponseCodeEnum.KOU01)
-                
-            user_entity = UserEntity.from_user(user)
-            created_user_entity = self.user_repository.create_user(user_entity)
-            self.session.commit()
-            return mapper.map_entity_to_user(created_user_entity)
+            result = await self.user_repository.create_user(user)
+            return result
         except CustomException as e:
-            self.session.rollback()
             raise e
-        except IntegrityError as e:
-            logger.error(f"Error de integridad al crear usuario: {e}")
-            self.session.rollback()
-            raise CustomException(ResponseCodeEnum.KOU01)
-        except SQLAlchemyError as e:
-            logger.error(f"Error al crear usuario: {e}")
-            self.session.rollback()
-            raise CustomException(ResponseCodeEnum.KOG02)
-        
-    def get_user_by_id(self, id: int) -> Optional[User]:
+
+    async def get_user_by_id(self, id: int) -> Optional[User]:
         """
         Obtiene un usuario por su ID.
-        
+
         Args:
-            id (int): ID del usuario a buscar.
-            
+            id: ID del usuario a buscar
+
         Returns:
-            Optional[User]: Usuario encontrado o None si no existe.
-            
-        Raises:
-            CustomException: Si hay un error en la operación de base de datos.
+            Optional[User]: Usuario encontrado o None si no existe
         """
+        await self.__ensure_session_health()
+        logger.info(f"Inicia el flujo de obtención de usuario por ID en base de datos. ID: {id}")
         try:
-            user_entity = self.user_repository.get_user_by_id(id)
-            return mapper.map_entity_to_user(user_entity)
+            result = await self.user_repository.get_user_by_id(id)
+            return result
         except CustomException as e:
             raise e
-        except SQLAlchemyError as e:
-            logger.error(f"Error al obtener usuario: {e}")
-            self.session.rollback()
-            raise CustomException(ResponseCodeEnum.KOG02)
-        
-    def get_user_by_username(self, username: str) -> Optional[User]:
+
+    async def get_user_by_username(self, username: str) -> Optional[User]:
         """
         Obtiene un usuario por su nombre de usuario.
-        
+
         Args:
-            username (str): Nombre de usuario del usuario a buscar.
-            
+            username: Nombre de usuario del usuario a buscar
+
         Returns:
-            Optional[User]: Usuario encontrado o None si no existe.
-            
-        Raises:
-            CustomException: Si hay un error en la operación de base de datos.
+            Optional[User]: Usuario encontrado o None si no existe
         """
+        await self.__ensure_session_health()
+        logger.info(f"Inicia el flujo de obtención de usuario por nombre de usuario en base de datos. Username: {username}")
         try:
-            user_entity = self.user_repository.get_user_by_username(username)
-            if not user_entity:
-                raise CustomException(ResponseCodeEnum.KOU02)
-            return mapper.map_entity_to_user(user_entity)
+            result = await self.user_repository.get_user_by_username(username)
+            return result
         except CustomException as e:
             raise e
-        except SQLAlchemyError as e:
-            logger.error(f"Error al obtener usuario: {e}")
-            self.session.rollback()
-            raise CustomException(ResponseCodeEnum.KOG02)
-    
-    def update_user(self, user: User) -> User:
+
+    async def update_user(self, user: User) -> User:
         """
-        Actualiza un usuario existente en la base de datos.
-        
+        Actualiza un usuario existente.
+
         Args:
-            user (User): Objeto de dominio User con los datos actualizados.
-            
+            user: Usuario a actualizar
+
         Returns:
-            User: Usuario actualizado.
-            
-        Raises:
-            CustomException: Si el usuario no existe o hay un error en la operación.
+            User: Usuario actualizado
         """
+        await self.__ensure_session_health()
+        logger.info(f"Inicia el flujo de actualización de usuario en base de datos. ID: {user.id}")
         try:
-            existing_user = self.user_repository.get_user_by_id(user.id)
-            if not existing_user:
-                raise CustomException(ResponseCodeEnum.KOU02)
-            user_entity = mapper.map_update_to_entity(user, existing_user)
-            updated_user_entity = self.user_repository.update_user(user_entity)
-            self.session.commit()
-            return mapper.map_entity_to_user(updated_user_entity)
+            result = await self.user_repository.update_user(user)
+            return result
         except CustomException as e:
-            self.session.rollback()
             raise e
-        except SQLAlchemyError as e:
-            logger.error(f"Error al actualizar usuario: {e}")
-            self.session.rollback()
-            raise CustomException(ResponseCodeEnum.KOG02)
-    
-    def create_image_metadata(self, image_metadata: ImageMetadata) -> ImageMetadata:
+
+    async def create_image_metadata(self, image_metadata: ImageMetadata) -> ImageMetadata:
         """
         Crea un nuevo metadato de imagen en la base de datos.
 
@@ -164,46 +126,51 @@ class Persistence(PersistenceGateway):
         Returns:
             ImageMetadata: Metadato de imagen creado.
         """
+
+        health_check_task = asyncio.create_task(self.__ensure_session_health())
+        image_metadata_entity = ImageMapper.map_image_metadata_to_entity(image_metadata)
+
+        await health_check_task
+
         logger.info("Inicia el flujo de creación de metadatos de imagen en base de datos")
         logger.info(f"Metadatos de imagen a crear: {image_metadata}")
+        
         try:
-            image_metadata_entity = ImageMapper.map_image_metadata_to_entity(image_metadata)
-            self.image_repository.create_image_metadata(image_metadata_entity)
-            self.session.commit()
-            return image_metadata
+            result = await self.image_repository.create_image_metadata(image_metadata_entity)
+            return result
         except CustomException as e:
-            self.session.rollback()
             raise e
         except SQLAlchemyError as e:
             logger.error(f"Error al crear metadatos de imagen: {e}")
             self.session.rollback()
+            await asyncio.sleep(0.5)  # Esperar antes de lanzar la excepción
             raise CustomException(ResponseCodeEnum.KOG02)
 
-    def get_total_images_uploaded(self) -> int:
+    async def get_total_images_uploaded(self) -> int:
         """
         Obtiene el total de imágenes subidas por los usuarios.
 
         Returns:
             int: Total de imágenes subidas
         """
+        await self.__ensure_session_health()
         try:
-            return self.masterdata_repository.get_total_images_uploaded()
+            return await self.masterdata_repository.get_total_images_uploaded()
         except SQLAlchemyError as e:
             logger.error(f"Error al obtener el total de imágenes subidas: {e}")
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
         
- 
-    
-    def get_top_users_by_images_uploaded_with_count(self) -> list[tuple[User, int]]:
+    async def get_top_users_by_images_uploaded_with_count(self) -> List[Tuple[User, int]]:
         """
         Obtiene los usuarios con más imágenes subidas junto con el conteo de imágenes.
 
         Returns:
             list[tuple[User, int]]: Lista de tuplas con usuario y cantidad de imágenes
         """
+        await self.__ensure_session_health()
         try:
-            result = self.masterdata_repository.get_top_users_by_images_uploaded()
+            result = await self.masterdata_repository.get_top_users_by_images_uploaded()
             users_with_count = []
             for user_entity, total_images in result:
                 user = mapper.map_entity_to_user(user_entity)
@@ -214,7 +181,7 @@ class Persistence(PersistenceGateway):
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
     
-    def get_total_images_uploaded_by_user(self, username: str) -> int:
+    async def get_total_images_uploaded_by_user(self, username: str) -> int:
         """
         Obtiene el total de imágenes subidas por un usuario.
 
@@ -224,8 +191,9 @@ class Persistence(PersistenceGateway):
         Returns:
             int: Total de imágenes subidas
         """
+        await self.__ensure_session_health()
         try:
-            return self.masterdata_repository.get_total_images_uploaded_by_user(username)
+            return await self.masterdata_repository.get_total_images_uploaded_by_user(username)
         except SQLAlchemyError as e:
             logger.error(f"Error al obtener el total de imágenes subidas por usuario: {e}")
             self.session.rollback()
