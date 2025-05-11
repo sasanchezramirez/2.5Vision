@@ -35,16 +35,14 @@ class Persistence(PersistenceGateway):
         
     async def __ensure_session_health(self) -> None:
         """
-        Verifica que la sesión esté en buen estado y la reinicia si es necesario.
+        Verifica que la sesión esté en buen estado y la reinicia si es necesario. Es un health check
         """
         try:
-            # Usar text() para indicar explícitamente que es una expresión SQL textual
             self.session.execute(text("SELECT 1")).scalar()
         except Exception as e:
             logger.warning(f"Detectado problema de sesión, reiniciando: {e}")
             self.session.close()
             await asyncio.sleep(0.5)
-            # La próxima operación creará una nueva sesión automáticamente
 
     async def create_user(self, user: User) -> User:
         """

@@ -31,7 +31,9 @@ class ImageRepository:
         
     async def create_image_metadata(self, image_metadata_entity: ImageMetadataEntity) -> ImageMetadata:
         """
-        Crea un nuevo metadato de imagen en la base de datos.
+        Crea un nuevo metadato de imagen en la base de datos. 
+        Aquí decidí usar una conexión directa a PostgreSQL para evitar problemas de sincronización
+        con la sesión de SQLAlchemy y para mejorar el rendimiento.
 
         Args:
             image_metadata: Metadato de imagen a crear
@@ -41,16 +43,13 @@ class ImageRepository:
         """
         logger.info(f"Creando metadato de imagen: {image_metadata_entity}")
         
-        # Siempre usar inserción directa para evitar problemas de tipo PostgreSQL
         connection = None
         
-        # Sanitizar campos de texto para evitar problemas de tipos
         weather_tags = image_metadata_entity.weather_tags if image_metadata_entity.weather_tags is not None else ""
         uploader_username = image_metadata_entity.uploader_username if image_metadata_entity.uploader_username is not None else ""
         image_url = image_metadata_entity.image_url if image_metadata_entity.image_url is not None else ""
         image_name = image_metadata_entity.image_name if image_metadata_entity.image_name is not None else ""
         
-        # Convertir valores numéricos si es necesario
         latitude = image_metadata_entity.latitude
         if latitude is not None and not isinstance(latitude, float):
             latitude = float(latitude)
@@ -64,7 +63,6 @@ class ImageRepository:
             visibility_score = int(visibility_score)
             
         try:
-            # Crear conexión directa
             logger.info("Usando conexión directa a PostgreSQL...")
             connection = psycopg2.connect(settings.DATABASE_URL)
             cursor = connection.cursor()
@@ -75,7 +73,6 @@ class ImageRepository:
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
             """
             
-            # Ejecutar en un hilo separado
             def execute_query():
                 try:
                     cursor.execute(
@@ -99,16 +96,13 @@ class ImageRepository:
                     connection.rollback()
                     raise e
             
-            # Ejecutar sin bloquear
             loop = asyncio.get_event_loop()
             image_id = await loop.run_in_executor(None, execute_query)
             
             if image_id:
                 logger.info(f"Imagen creada con éxito, ID: {image_id}")
-                # Actualizar la entidad con el ID asignado
                 image_metadata_entity.id = image_id
                 
-                # Crear un objeto de dominio con todos los datos
                 return ImageMetadata(
                     latitude=latitude,
                     longitude=longitude,
