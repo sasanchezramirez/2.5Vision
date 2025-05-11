@@ -30,7 +30,7 @@ class UserUseCase:
         """
         self.persistence_gateway: Final[PersistenceGateway] = persistence_gateway
 
-    def create_user(self, user: User) -> User:
+    async def create_user(self, user: User) -> User:
         """
         Crea un nuevo usuario en el sistema.
 
@@ -47,7 +47,7 @@ class UserUseCase:
         try:
             user.creation_date = datetime.now().isoformat()
             user.password = hash_password(user.password)
-            return self.persistence_gateway.create_user(user)
+            return await self.persistence_gateway.create_user(user)
         except CustomException as e:
             logger.error(f"Error al crear usuario: {e}")
             raise
@@ -55,7 +55,7 @@ class UserUseCase:
             logger.error(f"Error no manejado al crear usuario: {e}")
             raise CustomException(ResponseCodeEnum.KOG01)
 
-    def get_user(self, user: User) -> User:
+    async def get_user(self, user: User) -> User:
         """
         Obtiene un usuario por su ID o username.
         Si se proporciona el username, se busca por username.
@@ -76,12 +76,12 @@ class UserUseCase:
             # Si se proporciona el username, buscar por username
             if user.username and user.username != "default":
                 logger.info(f"Buscando usuario por username: {user.username}")
-                return self.persistence_gateway.get_user_by_username(user.username)
+                return await self.persistence_gateway.get_user_by_username(user.username)
             
             # Si no hay username o está vacío, buscar por ID
             if user.id:
                 logger.info(f"Buscando usuario por ID: {user.id}")
-                return self.persistence_gateway.get_user_by_id(user.id)
+                return await self.persistence_gateway.get_user_by_id(user.id)
             
             # Si no hay ni username ni ID, lanzar error
             logger.error("No se proporcionó ni username ni ID para la búsqueda")
@@ -94,7 +94,7 @@ class UserUseCase:
             logger.error(f"Error no manejado al obtener usuario: {e}")
             raise CustomException(ResponseCodeEnum.KOG01)
 
-    def update_user(self, user: User) -> User:
+    async def update_user(self, user: User) -> User:
         """
         Actualiza un usuario existente.
 
@@ -116,7 +116,7 @@ class UserUseCase:
             else:
                 logger.info("No se actualizará la contraseña del usuario")
             
-            return self.persistence_gateway.update_user(user)
+            return await self.persistence_gateway.update_user(user)
         except CustomException as e:
             logger.error(f"Error al actualizar usuario: {e}")
             raise

@@ -14,3 +14,15 @@ class S3Gateway(ABC):
             UploadImageResponse: Respuesta con la URL de la imagen subida y algunos datos de la imagen
         """
         pass
+    
+    @abstractmethod
+    async def upload_image_async(self, image: Image, has_metadata: bool) -> UploadImageResponse:
+        """
+        Sube una imagen a un bucket de AWS S3 de forma asíncrona.
+        Args:
+            image: Imagen a subir (objeto PIL.Image)
+            has_metadata: Indica si la imagen tiene metadatos
+        Returns:
+            UploadImageResponse: Respuesta con la URL de la imagen subida y algunos datos de la imagen
+        """
+        pass

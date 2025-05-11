@@ -9,13 +9,16 @@ from app.domain.model.util.response_codes import ResponseCodeEnum
 from app.domain.model.util.custom_exceptions import CustomException
 from app.domain.model.user import User
 from app.infrastructure.driven_adapter.persistence.entity.user_entity import UserEntity
+from app.infrastructure.driven_adapter.persistence.config.database import retry_on_db_error
+
 logger: Final[logging.Logger] = logging.getLogger("Masterdata Repository")
 
 class MasterdataRepository:
     def __init__(self, session: Session):
         self.session = session
         
-    def get_total_images_uploaded(self) -> int:
+    @retry_on_db_error(max_retries=3, initial_delay=1.0, max_delay=10.0)
+    async def get_total_images_uploaded(self) -> int:
         """
         Obtiene el total de imágenes subidas por los usuarios.
 
@@ -33,7 +36,8 @@ class MasterdataRepository:
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG01)
         
-    def get_top_users_by_images_uploaded(self) -> List[Tuple[UserEntity, int]]:
+    @retry_on_db_error(max_retries=3, initial_delay=1.0, max_delay=10.0)
+    async def get_top_users_by_images_uploaded(self) -> List[Tuple[UserEntity, int]]:
         """
         Obtiene los usuarios con más imágenes subidas.
 
@@ -66,7 +70,8 @@ class MasterdataRepository:
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG01)
     
-    def get_total_images_uploaded_by_user(self, username: str) -> int:
+    @retry_on_db_error(max_retries=3, initial_delay=1.0, max_delay=10.0)
+    async def get_total_images_uploaded_by_user(self, username: str) -> int:
         """
         Obtiene el total de imágenes subidas por un usuario.
 

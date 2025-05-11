@@ -37,7 +37,7 @@ router: Final[APIRouter] = APIRouter(
 
 @router.post('/create-user', response_model=ResponseDTO)
 @inject
-def create_user(
+async def create_user(
     user_dto: NewUserInput,
     user_usecase: UserUseCase = Depends(Provide[Container.user_usecase])
 ) -> JSONResponse:
@@ -55,7 +55,7 @@ def create_user(
     try:
         validate_new_user(user_dto)
         user = map_user_dto_to_user(user_dto)
-        user = user_usecase.create_user(user)
+        user = await user_usecase.create_user(user)
         response_data = map_user_to_user_output_dto(user).model_dump()
         return JSONResponse(
             status_code=200,
@@ -80,7 +80,7 @@ def create_user(
 
 @router.post('/get-user', response_model=ResponseDTO)
 @inject
-def get_user(
+async def get_user(
     get_user_dto: GetUser,
     user_usecase: UserUseCase = Depends(Provide[Container.user_usecase]),
     current_user: str = Depends(get_current_user)
@@ -100,7 +100,7 @@ def get_user(
     try:
         validate_get_user(get_user_dto)
         user = map_get_user_dto_to_user(get_user_dto)
-        user = user_usecase.get_user(user)
+        user = await user_usecase.get_user(user)
         response_data = map_user_to_user_output_dto(user).model_dump()
         return JSONResponse(
             status_code=200,
@@ -125,7 +125,7 @@ def get_user(
 
 @router.post('/login', response_model=ResponseDTO)
 @inject
-def login(
+async def login(
     login_dto: LoginInput,
     auth_usecase: AuthUseCase = Depends(Provide[Container.auth_usecase])
 ) -> JSONResponse:
@@ -143,7 +143,7 @@ def login(
     try:
         validate_login(login_dto)
         user = map_login_dto_to_user(login_dto)
-        token = auth_usecase.authenticate_user(user)
+        token = await auth_usecase.authenticate_user(user)
         
         if token:
             token_response = Token(access_token=token, token_type="bearer").model_dump()
@@ -174,7 +174,7 @@ def login(
 
 @router.post('/update-user', response_model=ResponseDTO)
 @inject
-def update_user(
+async def update_user(
     update_user_dto: UpdateUserInput,
     user_usecase: UserUseCase = Depends(Provide[Container.user_usecase]),
     current_user: str = Depends(get_current_user)
@@ -194,7 +194,7 @@ def update_user(
     try:
         validate_update_user(update_user_dto)
         user = map_update_user_dto_to_user(update_user_dto)
-        user = user_usecase.update_user(user)
+        user = await user_usecase.update_user(user)
         response_data = map_user_to_user_output_dto(user).model_dump()
         return JSONResponse(
             status_code=200,
@@ -219,7 +219,7 @@ def update_user(
     
 @router.post('/change-password', response_model=ResponseDTO)
 @inject
-def change_password(
+async def change_password(
     change_password_dto: ChangePasswordInput,
     auth_usecase: AuthUseCase = Depends(Provide[Container.auth_usecase])
     ) -> JSONResponse:
@@ -236,7 +236,7 @@ def change_password(
     logger.info("Iniciando cambio de contraseña")
     try:
         user = map_change_password_dto_to_user(change_password_dto)
-        user_saved = auth_usecase.change_password(user, change_password_dto.new_password)
+        user_saved = await auth_usecase.change_password(user, change_password_dto.new_password)
         response_data = map_user_to_user_output_dto(user_saved).model_dump()
         return JSONResponse(
             status_code=200,

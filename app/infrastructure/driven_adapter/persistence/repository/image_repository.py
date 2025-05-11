@@ -9,6 +9,7 @@ from app.infrastructure.driven_adapter.persistence.mapper.image_mapper import Im
 from app.domain.model.util.custom_exceptions import CustomException
 from app.domain.model.util.response_codes import ResponseCodeEnum
 from app.infrastructure.driven_adapter.persistence.entity.image_metadata_entity import ImageMetadataEntity
+from app.infrastructure.driven_adapter.persistence.config.database import retry_on_db_error
 
 logger: Final[logging.Logger] = logging.getLogger("Image Repository")
 
@@ -22,7 +23,8 @@ class ImageRepository:
     def __init__(self, session: Session):
         self.session: Final[Session] = session
     
-    def create_image_metadata(self, image_metadata_entity: ImageMetadataEntity) -> ImageMetadata:
+    @retry_on_db_error(max_retries=3, initial_delay=1.0, max_delay=10.0)
+    async def create_image_metadata(self, image_metadata_entity: ImageMetadataEntity) -> ImageMetadata:
         """
         Crea un nuevo metadato de imagen en la base de datos.
 
@@ -36,6 +38,7 @@ class ImageRepository:
         try:
             self.session.add(image_metadata_entity)
             self.session.commit()
+            return ImageMapper.map_entity_to_image_metadata(image_metadata_entity)
         except SQLAlchemyError as e:
             logger.error(f"Error al crear metadato de imagen: {e}")
             self.session.rollback()

@@ -42,7 +42,7 @@ class Persistence(PersistenceGateway):
         self.image_repository: Final[ImageRepository] = ImageRepository(session)
         self.masterdata_repository: Final[MasterdataRepository] = MasterdataRepository(session)
 
-    def create_user(self, user: User) -> User:
+    async def create_user(self, user: User) -> User:
         """
         Crea un nuevo usuario en la base de datos.
         
@@ -57,12 +57,12 @@ class Persistence(PersistenceGateway):
         """
         try:
             # Verificar si el nombre de usuario ya existe
-            existing_user = self.user_repository.get_user_by_username(user.username)
+            existing_user = await self.user_repository.get_user_by_username(user.username)
             if existing_user:
                 raise CustomException(ResponseCodeEnum.KOU01)
                 
             user_entity = UserEntity.from_user(user)
-            created_user_entity = self.user_repository.create_user(user_entity)
+            created_user_entity = await self.user_repository.create_user(user_entity)
             self.session.commit()
             return mapper.map_entity_to_user(created_user_entity)
         except CustomException as e:
@@ -77,7 +77,7 @@ class Persistence(PersistenceGateway):
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
         
-    def get_user_by_id(self, id: int) -> Optional[User]:
+    async def get_user_by_id(self, id: int) -> Optional[User]:
         """
         Obtiene un usuario por su ID.
         
@@ -91,7 +91,7 @@ class Persistence(PersistenceGateway):
             CustomException: Si hay un error en la operación de base de datos.
         """
         try:
-            user_entity = self.user_repository.get_user_by_id(id)
+            user_entity = await self.user_repository.get_user_by_id(id)
             return mapper.map_entity_to_user(user_entity)
         except CustomException as e:
             raise e
@@ -100,7 +100,7 @@ class Persistence(PersistenceGateway):
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
         
-    def get_user_by_username(self, username: str) -> Optional[User]:
+    async def get_user_by_username(self, username: str) -> Optional[User]:
         """
         Obtiene un usuario por su nombre de usuario.
         
@@ -114,7 +114,7 @@ class Persistence(PersistenceGateway):
             CustomException: Si hay un error en la operación de base de datos.
         """
         try:
-            user_entity = self.user_repository.get_user_by_username(username)
+            user_entity = await self.user_repository.get_user_by_username(username)
             if not user_entity:
                 raise CustomException(ResponseCodeEnum.KOU02)
             return mapper.map_entity_to_user(user_entity)
@@ -125,7 +125,7 @@ class Persistence(PersistenceGateway):
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
     
-    def update_user(self, user: User) -> User:
+    async def update_user(self, user: User) -> User:
         """
         Actualiza un usuario existente en la base de datos.
         
@@ -139,11 +139,11 @@ class Persistence(PersistenceGateway):
             CustomException: Si el usuario no existe o hay un error en la operación.
         """
         try:
-            existing_user = self.user_repository.get_user_by_id(user.id)
+            existing_user = await self.user_repository.get_user_by_id(user.id)
             if not existing_user:
                 raise CustomException(ResponseCodeEnum.KOU02)
             user_entity = mapper.map_update_to_entity(user, existing_user)
-            updated_user_entity = self.user_repository.update_user(user_entity)
+            updated_user_entity = await self.user_repository.update_user(user_entity)
             self.session.commit()
             return mapper.map_entity_to_user(updated_user_entity)
         except CustomException as e:
@@ -154,7 +154,7 @@ class Persistence(PersistenceGateway):
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
     
-    def create_image_metadata(self, image_metadata: ImageMetadata) -> ImageMetadata:
+    async def create_image_metadata(self, image_metadata: ImageMetadata) -> ImageMetadata:
         """
         Crea un nuevo metadato de imagen en la base de datos.
 
@@ -168,9 +168,7 @@ class Persistence(PersistenceGateway):
         logger.info(f"Metadatos de imagen a crear: {image_metadata}")
         try:
             image_metadata_entity = ImageMapper.map_image_metadata_to_entity(image_metadata)
-            self.image_repository.create_image_metadata(image_metadata_entity)
-            self.session.commit()
-            return image_metadata
+            return await self.image_repository.create_image_metadata(image_metadata_entity)
         except CustomException as e:
             self.session.rollback()
             raise e
@@ -179,7 +177,7 @@ class Persistence(PersistenceGateway):
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
 
-    def get_total_images_uploaded(self) -> int:
+    async def get_total_images_uploaded(self) -> int:
         """
         Obtiene el total de imágenes subidas por los usuarios.
 
@@ -187,15 +185,13 @@ class Persistence(PersistenceGateway):
             int: Total de imágenes subidas
         """
         try:
-            return self.masterdata_repository.get_total_images_uploaded()
+            return await self.masterdata_repository.get_total_images_uploaded()
         except SQLAlchemyError as e:
             logger.error(f"Error al obtener el total de imágenes subidas: {e}")
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
         
- 
-    
-    def get_top_users_by_images_uploaded_with_count(self) -> list[tuple[User, int]]:
+    async def get_top_users_by_images_uploaded_with_count(self) -> list[tuple[User, int]]:
         """
         Obtiene los usuarios con más imágenes subidas junto con el conteo de imágenes.
 
@@ -203,7 +199,7 @@ class Persistence(PersistenceGateway):
             list[tuple[User, int]]: Lista de tuplas con usuario y cantidad de imágenes
         """
         try:
-            result = self.masterdata_repository.get_top_users_by_images_uploaded()
+            result = await self.masterdata_repository.get_top_users_by_images_uploaded()
             users_with_count = []
             for user_entity, total_images in result:
                 user = mapper.map_entity_to_user(user_entity)
@@ -214,7 +210,7 @@ class Persistence(PersistenceGateway):
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
     
-    def get_total_images_uploaded_by_user(self, username: str) -> int:
+    async def get_total_images_uploaded_by_user(self, username: str) -> int:
         """
         Obtiene el total de imágenes subidas por un usuario.
 
@@ -225,7 +221,7 @@ class Persistence(PersistenceGateway):
             int: Total de imágenes subidas
         """
         try:
-            return self.masterdata_repository.get_total_images_uploaded_by_user(username)
+            return await self.masterdata_repository.get_total_images_uploaded_by_user(username)
         except SQLAlchemyError as e:
             logger.error(f"Error al obtener el total de imágenes subidas por usuario: {e}")
             self.session.rollback()
