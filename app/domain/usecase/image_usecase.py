@@ -86,18 +86,15 @@ class ImageUseCase:
             image_config_metadata = self._get_image_configuration_metadata(image_pilow)
             normalized_image = self._image_normalization(image_pilow, image_config_metadata)
             
-            # Usar la versión asíncrona de upload_image
             file_details = await self.s3_gateway.upload_image_async(normalized_image, has_metadata)
             image_metadata.image_url = file_details.image_url
             image_metadata.image_name = file_details.image_name
             
-            # Guardar en base de datos solo si S3 fue exitoso
             await self.persistence_gateway.create_image_metadata(image_metadata)
             logger.info(f"Imagen subida a S3 y metadatos guardados en la base de datos: {image_metadata.image_url}")
             return image_metadata
         except Exception as e:
             logger.error(f"Error en el flujo de carga de imágenes: {str(e)}")
-            # Si falla después de subir a S3 pero antes de guardar en BD, podríamos limpiar
             if hasattr(image_metadata, 'image_url') and image_metadata.image_url:
                 try:
                     # Esta limpieza se podría hacer asíncrona también

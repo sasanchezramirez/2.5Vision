@@ -126,25 +126,16 @@ class Persistence(PersistenceGateway):
         Returns:
             ImageMetadata: Metadato de imagen creado.
         """
-        await self.__ensure_session_health()
+
+        health_check_task = asyncio.create_task(self.__ensure_session_health())
+        image_metadata_entity = ImageMapper.map_image_metadata_to_entity(image_metadata)
+
+        await health_check_task
+
         logger.info("Inicia el flujo de creación de metadatos de imagen en base de datos")
         logger.info(f"Metadatos de imagen a crear: {image_metadata}")
         
-        # Asegurarse de que todos los campos de texto tengan valores adecuados
-        if image_metadata.weather_tags is None:
-            image_metadata.weather_tags = ""
-        
-        if image_metadata.uploader_username is None:
-            image_metadata.uploader_username = ""
-            
-        if image_metadata.image_url is None:
-            image_metadata.image_url = ""
-            
-        if image_metadata.image_name is None:
-            image_metadata.image_name = ""
-        
         try:
-            image_metadata_entity = ImageMapper.map_image_metadata_to_entity(image_metadata)
             result = await self.image_repository.create_image_metadata(image_metadata_entity)
             return result
         except CustomException as e:
