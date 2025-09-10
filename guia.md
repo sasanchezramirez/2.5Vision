@@ -1,4 +1,4 @@
-# GUÍA DEFINITIVA: PROYECTO 2.5VISION
+# Mi ML Manifest: 2.5Vision
 
 ## De Básico a ML Engineer Avanzado - Proyecto Insignia
 
@@ -6,32 +6,29 @@
 
 ## FILOSOFÍA DEL PROYECTO
 
-> **Justificación de la Filosofía:**
-> Este proyecto no es solo sobre construir un software, es sobre construir un **experto**. Los análisis previos (`PLAN_CONSULTORÍA` y `ANÁLIS_ARQUITECTURAL`) revelaron brechas significativas en MLOps y diseño de sistemas. Esta filosofía aborda esas brechas de frente.
-> - **Learning-First:** Convierte la "falta de experiencia" de un riesgo a la métrica principal de éxito. Cada tarea está diseñada para enseñar un concepto de nivel industrial.
+
+> Este proyecto no es solo sobre construir un software, es sobre construir un **experto**. La filosofía en la que abordo este proyecto se sostiene sobre los siguientes pilares:
+> - **Learning-First:** Convierto la "falta de experiencia" de un riesgo a la métrica principal de éxito. Cada tarea debe enseñarme un concepto de nivel industrial.
 > - **Portfolio-Ready:** El objetivo es crear un proyecto tan bien documentado y estructurado que hable por sí mismo en una entrevista o presentación a inversores.
-> - **Cost-Efficient:** Elimina la barrera de entrada. Demuestra que se puede construir un sistema de ML de alta calidad sin un gran presupuesto, una habilidad muy valorada en startups y entornos lean.
-> - **Industry-Standard:** Se enfoca en tecnologías y prácticas (Terraform, PyTorch, Ensemble Learning) que son directamente transferibles a un rol de ML Engineer de alto nivel.
+> - **Cost-Efficient:** Elimino la barrera de entrada. Demuestro que se puede construir un sistema de ML de alta calidad sin un gran presupuesto.
+> - **Industry-Standard:** Me enfoco en tecnologías y prácticas (Terraform, PyTorch, Ensemble Learning) que son directamente transferibles a un rol de ML Engineer de alto nivel.
 
 ### Objetivo Principal: 
-Crear un sistema ML de clase mundial para estimación de PM2.5 que sirva como:
-- Tu transición de básico a avanzado en ML Engineering
-- Portfolio piece para atraer socios/inversión
-- Contribución científica al monitoreo ambiental
-- Plataforma de aprendizaje continuo
+Crear un sistema ML para estimación de PM2.5 que contribuya de manera científica al monitoreo ambiental, de donde se peudan sacar conclusiones de qué hacer y qué no hacer.
 
 ### Principios Guía:
 - Learning-First: Cada decisión maximiza aprendizaje
-- Portfolio-Ready: Documentación y arquitectura impresionante
+- Portfolio-Ready: Documentación y arquitectura
 - Cost-Efficient: $10/mes budget con escalabilidad futura
 - Industry-Standard: Tecnologías demandadas en el mercado
+- Escalas de tiempo: Defino las *etapas* como una unidad de tiempo, la cual se puede relacionar como "una etapa es una semana si estuviese full dedicado"
 
 ---
 
-## FASE 0: SETUP Y FUNDACIÓN ESTRATÉGICA (2-3 semanas)
+## FASE 0: SETUP Y FUNDACIÓN ESTRATÉGICA (2-3 etapas)
 
 > **Objetivo de la Fase 0:**
-> Establecer una base sólida antes de escribir una sola línea de código de la aplicación. Un error común es saltar directamente a la codificación, acumulando deuda técnica y conceptual. Esta fase asegura que el "qué" y el "porqué" estén claros, haciendo que el "cómo" (la codificación) sea mucho más eficiente y efectivo.
+> Establecer una base sólida antes de escribir una sola línea de código de la aplicación. No busco meterme de una a echar código, acumulando deuda técnica y conceptual. En esta fase aseguro que el "qué" y el "porqué" estén claros, haciendo que el "cómo" (la carpintería) sea mucho más eficiente y efectivo.
 >
 > **Estado Esperado al Final de la Fase:**
 > - Cero código de aplicación funcional.
@@ -40,17 +37,17 @@ Crear un sistema ML de clase mundial para estimación de PM2.5 que sirva como:
 > - Un sistema de gestión y validación de datos listo para ser utilizado.
 > - El proyecto estará listo para construir sobre roca, no sobre arena.
 
-### Semana 1: Research & Design
+### Etapa 1: Research & Design
 
-#### Día 1-2: Investigación Científica Profunda
+#### Investigación Científica Profunda
 
-##### Objetivo: Dominar el domain knowledge
+##### Objetivo: Dominar el domain knowledge y evitar el "eso ya lo sé"
 
 > **Justificación:**
-> El Machine Learning no opera en el vacío. Un modelo puede ser matemáticamente correcto pero científicamente inútil. Este paso es crucial para entender la física atmosférica y la óptica detrás del problema. Sin este conocimiento, el "feature engineering" sería adivinar en la oscuridad. Esta investigación informará cada decisión técnica en el pipeline de ML.
+> Un modelo puede ser matemáticamente correcto pero científicamente inútil. Mi ventaja como ingeniero es que también soy físico, es por eso que un fundamento sólido será crucial para el proyecto: dominar la física atmosférica y la óptica detrás del problema. Sin este conocimiento, el "feature engineering" sería adivinar en la oscuridad. Esta investigación informará cada decisión técnica en el pipeline de ML.
 
 ###### Tareas de Investigación:
-- Paper Review: Leer 10+ papers sobre PM2.5 estimation via images
+- Paper Review (incluyendo mi tesis ;) )
 - State-of-the-art: Identificar benchmarks actuales
 - Feature Analysis: Entender qué features visuales correlacionan con PM2.5
 - Uncertainty Quantification: Métodos para medir confianza en predicciones
@@ -64,23 +61,21 @@ Crear un sistema ML de clase mundial para estimación de PM2.5 que sirva como:
 └── uncertainty_methods.md
 ```
 
-#### Día 3-4: Arquitectura Definitiva
+#### Arquitectura Definitiva
 
 > **Justificación de Decisiones:**
 > Las decisiones aquí están optimizadas para el aprendizaje y el bajo costo, sin sacrificar los estándares de la industria.
-> - **ML Framework (PyTorch):** Elegido por su flexibilidad y su API "pythonica", ideal para la investigación y el desarrollo de modelos complejos. *Alternativas: TensorFlow/Keras son excelentes, especialmente si el objetivo es un ecosistema de producción más maduro como TFX.*
-> - **Model Serving (TorchServe on EC2):** En lugar de una solución gestionada y costosa como SageMaker, desplegar en una VM básica (EC2) fuerza el aprendizaje de los fundamentos del despliegue de modelos, redes y seguridad, a un costo mínimo. *Alternativas: AWS SageMaker para MLOps gestionado, FastAPI/Uvicorn para un servicio Python puro, o Knative para auto-escalado en Kubernetes.*
-> - **Feature Store (Custom SQLite):** Un Feature Store completo como Feast es una sobre-ingeniería en esta etapa. Usar SQLite para gestionar metadatos de features enseña los conceptos de un feature store (registro, versionado) sin la complejidad operacional. *Alternativas: Feast, Tecton (enterprise), o simplemente archivos Parquet en S3 con una buena convención de nombrado.*
-> - **Monitoring (Custom + CloudWatch):** Evita herramientas complejas como MLflow para enfocarse en los fundamentos: ¿qué métricas son importantes y cómo las capturo? CloudWatch es suficiente para métricas de infraestructura y logs básicos. *Alternativas: MLflow para un tracking de experimentos completo, Prometheus/Grafana para monitoreo avanzado, o Neptune.ai/Weights & Biases para visualización de experimentos.*
-
-##### Diseño Técnico Completo:
+> - **ML Framework:** Entran en juego Pytorch y TensorFlow/Keras
+> - **Model Serving:** Seguramente tendré que sacrificar algunas funcionalidades por costos, pero se decidirá entre TorchServe en un EC2, SageMaker, un Uvicorn con FastAPI (full backend mood), Knativ en Kubernetes.
+> - **Feature Store:** Teneindo en cuenta la naturaleza de estos datos (y que actualmtne tengo algunos en una postgres), tendré que decidir entre continuar con postgres, un custom SQLite, Feast, Tecton  o simplemente archivos Parquet en S3 con una buena convención de nombrado.
+> - **Monitoring (Custom + CloudWatch):** Por facilidad viene CloudWatch, pero por costos quizás revise un Prometheus/Grafana.
+##### Diseño Técnico Completo (agnósitco a las decisiones anteriores):
 ```mermaid
 graph TB
     subgraph "Data Layer"
         Dataset[Image Dataset 1000+]
         PurpleAir[PurpleAir API]
         SIATA[SIATA API]
-        S3[S3 Storage]
     end
 
     subgraph "ML Pipeline"
@@ -96,27 +91,22 @@ graph TB
         Monitoring[ML Monitoring]
     end
 
-    subgraph "AWS Infrastructure ($10/month)"
-        EC2[EC2 t3.micro]
-        Lambda[Lambda Functions]
-        CloudWatch[CloudWatch]
+    subgraph " Infrastructure ($10/mes)"
+        Computing[Model serving]
+        Serverless[Serverless Functions]
+        Observability[Observability]
         ECR[ECR Registry]
     end
 ```
 
-##### Decisiones Arquitecturales Documentadas:
-- ML Framework: PyTorch (vs TensorFlow) - Razón: Research flexibility
-- Model Serving: TorchServe on EC2 (vs SageMaker) - Razón: Cost
-- Feature Store: Custom SQLite (vs Feast) - Razón: Simplicity + Budget
-- Monitoring: Custom + CloudWatch (vs MLflow) - Razón: Learning
-
-#### Día 5-7: Technical Specification
+#### Technical Specification
 
 ##### Documento ADR (Architecture Decision Records):
 
 > **Objetivo:**
-> La práctica de escribir ADRs fuerza a pensar y justificar las decisiones arquitectónicas importantes. Crean un registro histórico invaluable que explica *por qué* el sistema es como es, crucial para la mantenibilidad a largo plazo y para la incorporación de nuevos miembros al equipo.
+> La práctica de escribir ADRs me fuerza a pensar y justificar las decisiones arquitectónicas importantes. Crean un registro histórico invaluable que explica *por qué* el sistema es como es, crucial para la mantenibilidad a largo plazo.
 
+Sería algo así:
 ```
 # docs/architecture/ADRs/
 ├── 001-ml-framework-pytorch.md
@@ -126,14 +116,20 @@ graph TB
 └── 005-data-pipeline-design.md
 ```
 
-### Semana 2: Development Setup
+### Etapa 2: Development Setup
 
 #### Infraestructura como Código
 
 > **Objetivo:**
-> Automatizar la creación de la infraestructura en la nube. Usar Terraform (Infraestructura como Código) previene el "click-ops" (configuración manual en la consola de AWS), lo que garantiza que el entorno sea reproducible, versionable y fácil de destruir y recrear. Esta es una práctica fundamental en DevOps y MLOps.
+> Automatizar la creación de la infraestructura en la nube. Usar Terraform (o cloudeformation) previene el "click-ops" (configuración manual en la consola de AWS), lo que garantiza que el entorno sea reproducible, versionable y fácil de destruir y recrear. Hablo de AWS porque con toda seguridad tenga la solución allí.
 
-##### Terraform para $10/mes:
+Me debo de asegurar en priemra instancia de:
+- La creación del servidor (y de un scheduler).
+- Una buena configuración a nivel de almacenamiento.
+- Tener una configuracón escalable y segura de las redes.
+- El contrato apifirst (OpenaApi)
+
+<!-- ##### Terraform para $10/mes:
 ```terraform
 # EC2 t3.micro (Free tier eligible)
 resource "aws_instance" "ml_server" {
@@ -161,14 +157,16 @@ resource "aws_s3_bucket" "vision_data" {
     }
   }
 }
-```
+``` -->
 
-### Semana 3: ML Foundation
+### Etapa 3: ML Foundation
 
 #### Dataset Management Profesional
 
 > **Objetivo:**
-> Tratar los datos como un ciudadano de primera clase. Un sistema de ML es tan bueno como los datos con los que se entrena. Este `VisionDatasetManager` introduce prácticas profesionales como el versionado de datasets y el hashing para garantizar la reproducibilidad de los experimentos. Si el dataset cambia, el hash cambia, y se puede rastrear exactamente qué datos produjeron qué modelo.
+> Tratar de seguir esa frase de linkedin que reza que un sistema de ML es tan bueno como los datos con los que se entrena. Un `VisionDatasetManager` introduce prácticas profesionales como el versionado de datasets y el hashing para garantizar la reproducibilidad de los experimentos. Si el dataset cambia, el hash cambia, y se puede rastrear exactamente qué datos produjeron qué modelo.
+
+Ejemplo:
 
 ```python
 # src/data/dataset_manager.py
@@ -201,7 +199,9 @@ class VisionDatasetManager:
 #### Data Validation Pipeline:
 
 > **Objetivo:**
-> Implementar el principio de "Garbage In, Garbage Out". Un modelo de ML entrenado con imágenes borrosas, sobreexpuestas o de baja resolución producirá predicciones poco fiables. Este validador actúa como un guardián de la calidad, asegurando que solo los datos de alta calidad entren en el pipeline de entrenamiento.
+> Implementar el principio de "Garbage In, Garbage Out". Un modelo de ML entrenado con imágenes borrosas, sobreexpuestas o de baja resolución producirá predicciones poco fiables. Este validador actúa como un guardián de la calidad, asegurando que solo los datos de alta calidad entren en el pipeline de entrenamiento. Esto no solo debe aplicar para la calidad sino para ciertos parámteros como la exposición, balance de blancos, etc, ya que son cruciales para la respeusta del modelo.
+
+Ejemplo:
 
 ```python
 # src/data/validators.py
@@ -249,10 +249,10 @@ class ImageQualityValidator:
 
 ---
 
-## FASE 1: ML CORE - BECOMING ML ENGINEER (6-8 semanas)
+## FASE 1: ML CORE - BECOMING ML ENGINEER
 
 > **Objetivo de la Fase 1:**
-> Esta es la fase central de aprendizaje y construcción. Aquí es donde se implementa el "cerebro" del sistema. Se pasa de la teoría y la preparación a la implementación práctica de un pipeline de ML de nivel profesional, abordando directamente las debilidades críticas del sistema actual.
+> Esta es la fase central de aprendizaje y construcción. Aquí es donde se implemento el "cerebro" del sistema. Se pasa de la teoría y la preparación a la implementación práctica de un pipeline de ML de nivel profesional.
 >
 > **Estado Esperado al Final de la Fase:**
 > - Un pipeline de ML completo y funcional, desde la extracción de características hasta la validación del modelo.
@@ -260,12 +260,14 @@ class ImageQualityValidator:
 > - Un conjunto de scripts y notebooks que demuestran el proceso de entrenamiento y evaluación.
 > - El proyecto tendrá un "motor" de ML robusto, listo para ser expuesto a través de una API.
 
-### Semana 4-5: Feature Engineering Científico
+### Etapa 4: Feature Engineering Científico
 
 #### Advanced Computer Vision Features
 
 > **Objetivo:**
-> Ir más allá de las estadísticas simples. Esta es la implementación directa de la investigación científica de la Fase 0. Se extraen características que tienen una base física y teórica de correlación con la calidad del aire, como la dispersión de la luz (visibilidad, textura) y los cambios de color. Este es el paso que le da al modelo su "poder de predicción".
+> Ir más allá de las estadísticas simples. Esta es la implementación directa de la investigación científica de la Fase 0. Se extraen características que tienen una base física y teórica de correlación con la calidad del aire, como la dispersión de la luz (visibilidad, textura) y los cambios de color. Este es el paso que le da al modelo su "poder de predicción". Aquí es donde se implementa la diferencia entre un ML y un PINN (Physics-Informed Neural Networks).
+
+Ejemplo:
 
 ```python
 # src/ml/features/vision_features.py
@@ -335,6 +337,8 @@ class ScientificFeatureExtractor:
 > **Objetivo:**
 > Orquestar el proceso de extracción de características de manera profesional. Un pipeline asegura que cada imagen (ya sea para entrenamiento o para predicción) pase exactamente por los mismos pasos de transformación (extracción, escalado, selección). Esto es fundamental para evitar el "training-serving skew", un error común donde las diferencias entre el preprocesamiento de entrenamiento y el de producción arruinan el rendimiento del modelo.
 
+Ejemplo:
+
 ```python
 # src/ml/pipeline/feature_pipeline.py
 class FeaturePipeline:
@@ -375,12 +379,14 @@ class FeaturePipeline:
         return features_selected
 ```
 
-### Semana 6-7: Model Development & Training
+### Etapa 5: Model Development & Training
 
 #### Ensemble Learning Strategy
 
 > **Objetivo:**
-> Mejorar la robustez y la precisión. En lugar de depender de un solo tipo de modelo, el "stacking" o ensamblaje combina las predicciones de varios modelos base (ej. árboles de decisión, redes neuronales) y entrena un "meta-modelo" para producir la predicción final. Esta técnica a menudo gana competiciones de Kaggle y es una práctica estándar para obtener el máximo rendimiento.
+> Mejorar la robustez y la precisión. En lugar de depender de un solo tipo de modelo, el "stacking" o ensamblaje combina las predicciones de varios modelos base (ej. árboles de decisión, redes neuronales) y entrena un "meta-modelo" para producir la predicción final.
+
+Ejemplo:
 
 ```python
 # src/ml/models/ensemble_model.py
@@ -454,8 +460,9 @@ class PM25EnsembleModel:
 #### Uncertainty Quantification:
 
 > **Objetivo:**
-> Proporcionar una predicción honesta. Un modelo que predice "25.5 PM2.5" es menos útil que uno que predice "25.5 PM2.5 con una incertidumbre de +/- 5.0". La cuantificación de la incertidumbre es una característica de un sistema de ML maduro. Aquí se utiliza una Red Neuronal Bayesiana (o Monte Carlo Dropout como aproximación) para estimar esta confianza.
+> Proporcionar una predicción honesta. Un modelo que predice "25.5 PM2.5" es menos útil que uno que predice "25.5 PM2.5 con una incertidumbre de +/- 5.0". La cuantificación de la incertidumbre es una característica de un sistema de ML maduro. Aquí puedo llegar a utilizar una Red Neuronal Bayesiana (o Monte Carlo Dropout como aproximación) para estimar esta confianza.
 
+Ejemplo:
 ```python
 # src/ml/uncertainty/bayesian_model.py
 import torch
@@ -503,12 +510,14 @@ class BayesianNeuralNetwork(nn.Module):
         return mean, std
 ```
 
-### Semana 8: Model Validation & Metrics
+### Etapa 6: Model Validation & Metrics
 
 #### Scientific Validation Pipeline
 
 > **Objetivo:**
-> Asegurar que el modelo no solo sea estadísticamente preciso, sino también científicamente coherente. Un modelo podría tener un buen RMSE pero predecir valores negativos de PM2.5 (físicamente imposible) o no capturar los patrones diurnos esperados. Este validador actúa como una revisión por pares automatizada, aumentando drásticamente la confianza en el sistema.
+> Debo asegurar que el modelo no solo sea estadísticamente preciso, sino también científicamente coherente. Un modelo podría tener un buen RMSE pero predecir valores negativos de PM2.5 (físicamente imposible) o no capturar los patrones diurnos esperados. Este validador actúa como una revisión por pares automatizada, aumentando drásticamente la confianza en el sistema.
+
+Ejemplo:
 
 ```python
 # src/ml/evaluation/scientific_validation.py
@@ -585,23 +594,24 @@ class ScientificValidator:
 
 ---
 
-## FASE 2: PRODUCTION SYSTEM (4-6 semanas)
+## FASE 2: PRODUCTION SYSTEM
 
 > **Objetivo de la Fase 2:**
-> Poner el modelo a trabajar. Esta fase se centra en envolver el pipeline de ML de la Fase 1 en una API robusta y lista para producción. Se abordan temas como el versionado de modelos en tiempo real, el monitoreo de predicciones y el manejo de errores.
+> Pongo el modelo a trabajar. Esta fase se centra en envolver el pipeline de ML de la Fase 1 en una API robusta y lista para producción. Abordo temas como el versionado de modelos en tiempo real, el monitoreo de predicciones y el manejo de errores.
 >
 > **Estado Esperado al Final de la Fase:**
 > - Una API web (FastAPI) desplegada en la infraestructura de AWS.
 > - Un endpoint `/predict` que acepta una imagen y devuelve una estimación de PM2.5 en formato JSON.
 > - El sistema estará "vivo" y será capaz de servir predicciones a usuarios o a otras aplicaciones.
 
-### Semana 9-10: Model Serving & APIs
+### Etapa 7: Model Serving & APIs
 
 #### Production Model Serving
 
 > **Objetivo:**
 > Crear un servicio confiable y monitoreable. El `ModelService` no solo llama al método `predict` del modelo. Orquesta todo el flujo de inferencia: carga y validación de la imagen, llamada al pipeline de características, obtención de la predicción con incertidumbre, y (crucialmente) registro de métricas sobre la predicción y el tiempo de procesamiento.
 
+Ejemplo guía:
 ```python
 # src/api/model_service.py
 from fastapi import FastAPI, UploadFile, HTTPException
@@ -666,15 +676,17 @@ async def predict_pm25(file: UploadFile):
     return await model_service.predict(
 ```
 
-### Semana 11: Monitoring y Observabilidad
+### Etapa 8: Monitoring y Observabilidad
 
 > **Objetivo:**
-> Un modelo en producción sin monitoreo es una caja negra y una bomba de tiempo. El objetivo de esta semana es dar visibilidad al rendimiento del sistema. No solo monitoreamos la infraestructura (CPU, memoria), sino también el comportamiento del modelo: ¿Qué tipo de datos está viendo? ¿Sus predicciones son estables? ¿Hay errores? Esto nos permite detectar problemas proactivamente antes de que afecten a los usuarios.
+> Dar visibilidad al rendimiento del sistema. No solo monitoreo la infraestructura (CPU, memoria), sino también el comportamiento del modelo: ¿Qué tipo de datos está viendo? ¿Sus predicciones son estables? ¿Hay errores? Esto me permitirá detectar problemas proactivamente antes de que afecten a los usuarios (si es que los hay :) ).
 
 #### Implementación de Métricas Clave
 
 > **Justificación:**
-> El `MetricsCollector` del `ModelService` necesita enviar datos a alguna parte. Usaremos Amazon CloudWatch Metrics, ya que se integra fácilmente y es de bajo costo. Definiremos "métricas personalizadas" que son específicas de nuestra aplicación de ML.
+> El `MetricsCollector` del `ModelService` necesita enviar datos a alguna parte. Dependiendo de la decisión tomada en la fase 0 (CloudWatch Metrics o Grafana).Definiremos "métricas personalizadas" que son específicas de nuestra aplicación de ML.
+
+Ejemplo con CloudWatchMetrics:
 
 ```python
 # src/monitoring/metrics_collector.py
@@ -736,13 +748,13 @@ class CloudWatchMetricsCollector:
 ```
 
 > **Estado Esperado:**
-> - Un dashboard en Amazon CloudWatch que muestre en tiempo real:
+> - Un dashboard que muestre en tiempo real:
 >   - La latencia promedio de las predicciones.
 >   - El número de errores por minuto/hora.
 >   - La distribución de la incertidumbre de las predicciones.
 > - Alertas configuradas (ej. vía email o SMS) si la latencia supera un umbral o si la tasa de errores aumenta súbitamente.
 
-### Semana 12: Pipeline de CI/CD
+### Etapa 9: Pipeline de CI/CD
 
 > **Objetivo:**
 > Automatizar el proceso de despliegue. Un pipeline de CI/CD (Integración Continua / Despliegue Continuo) asegura que cada cambio en el código sea automáticamente testeado y, si pasa los tests, desplegado a producción de manera consistente y segura. Esto elimina el riesgo de errores manuales y acelera drásticamente la velocidad de desarrollo.
@@ -750,12 +762,13 @@ class CloudWatchMetricsCollector:
 #### Automatización con GitHub Actions
 
 > **Justificación:**
-> Usaremos GitHub Actions porque está integrado directamente en GitHub y tiene un generoso plan gratuito. El pipeline definido a continuación hará lo siguiente en cada `push` a la rama `main`:
+> Voy a usar GitHub Actions porque está integrado directamente en GitHub y porque el plan gratuito está melísimo. El pipeline definido hará lo siguiente en cada `push` a la rama `main`:
 > 1.  **Lint & Test:** Asegura que el código mantenga un estilo consistente y que no se hayan introducido regresiones.
 > 2.  **Build Docker Image:** Empaqueta la aplicación FastAPI en una imagen de Docker, creando un artefacto inmutable y portable.
 > 3.  **Push to ECR:** Sube la imagen a Amazon ECR (Elastic Container Registry), el registro de imágenes de AWS.
-> 4.  **Deploy to EC2:** Se conecta a la instancia EC2 vía SSH y ejecuta un script que detiene el contenedor antiguo, descarga la nueva imagen de ECR y levanta el nuevo contenedor.
+> 4.  **Deploy:** Se conecta a la instancia EC2 vía SSH (si es que así lo decido) y ejecuta un script que detiene el contenedor antiguo, descarga la nueva imagen de ECR y levanta el nuevo contenedor.
 
+Ejemplo del .yml:
 ```yaml
 # .github/workflows/deploy.yml
 name: Deploy to Production
@@ -812,7 +825,7 @@ jobs:
 ```
 
 > **Estado Esperado:**
-> - Al hacer `git push` a la rama `main`, el nuevo código se despliega automáticamente en la instancia EC2 en cuestión de minutos, sin intervención manual.
+> - Al hacer `git push` a la rama `main`, el nuevo código se despliega automáticamente en la instancia del servidor en cuestión de minutos, sin intervención manual.
 > - El proyecto ahora tiene un flujo de trabajo de MLOps básico pero completo: desde el código hasta un modelo en producción.
 
 ---
@@ -820,36 +833,36 @@ jobs:
 ## FASE 3: ITERACIÓN Y MLOPS AVANZADO (Continuo)
 
 > **Objetivo de la Fase 3:**
-> Un sistema de ML no es un proyecto de "desplegar y olvidar". Los modelos se degradan con el tiempo a medida que el mundo cambia (esto se llama **model drift**). Esta fase se enfoca en el ciclo de vida del ML: cómo re-entrenar, evaluar y desplegar nuevas versiones del modelo de forma segura y automatizada para mantener y mejorar el rendimiento del sistema a lo largo del tiempo.
+> Como los modelos se degradan con el tiempo a medida que todo cambia (**model drift**), esta fase se enfoca en el ciclo de vida del ML: cómo re-entrenar, evaluar y desplegar nuevas versiones del modelo de forma segura y automatizada para mantener y mejorar el rendimiento del sistema a lo largo del tiempo.
 
 ### Tarea Continua 1: Pipeline de Re-entrenamiento Automatizado
 
 > **Objetivo:**
-> Eliminar el proceso manual de re-entrenamiento. Crearemos un script que pueda ser ejecutado de forma programada (ej. una vez al mes) para re-entrenar el modelo con los datos más recientes.
+> Eliminar el proceso manual de re-entrenamiento. Pretendo crear un script que pueda ser ejecutado de forma programada (ej. una vez al mes) para re-entrenar el modelo con los datos más recientes.
 >
 > **Justificación:**
 > A medida que se recolectan más imágenes y mediciones de PM2.5, el modelo puede aprender de estos nuevos datos para volverse más preciso o adaptarse a cambios estacionales. La automatización asegura que este proceso se realice de manera consistente.
 >
 > **Implementación (Ejemplo con un script y cron):**
-> Se crea un script `retrain.py` que utiliza el `VisionDatasetManager` para obtener los últimos datos, el `FeaturePipeline` y el `PM25EnsembleModel` para entrenar, y el `ScientificValidator` para evaluar. Si el nuevo modelo supera al anterior en un conjunto de métricas clave, se guarda en S3 con una nueva versión y se registra en la base de datos de SQLite.
+> Puedo crear un script `retrain.py` que utiliza el `VisionDatasetManager` para obtener los últimos datos, el `FeaturePipeline` y el `PM25EnsembleModel` para entrenar, y el `ScientificValidator` para evaluar. Si el nuevo modelo supera al anterior en un conjunto de métricas clave, se guarda en S3 con una nueva versión y se registra en la base de datos de features.
 >
-> En la instancia EC2, se configura un `cron job` para ejecutar este script periódicamente:
+> En la instancia servidor, se configura un `cron job` para ejecutar este script periódicamente:
 > `0 2 1 * * /usr/bin/python3 /path/to/retrain.py` (Ejecutar a las 2 AM el primer día de cada mes).
 >
-> *Alternativas: Para pipelines más complejos, se usan orquestadores como **Apache Airflow**, **Kubeflow Pipelines**, o **AWS Step Functions**.*
+> Ojo que también puedo usar StepFuncitons o una lambda
 
 ### Tarea Continua 2: Monitoreo de Model Drift
 
 > **Objetivo:**
-> Detectar cuándo el modelo está "envejeciendo". El Model Drift ocurre cuando las características de los datos de entrada en producción (ej. imágenes de un invierno con mucha neblina) empiezan a diferir significativamente de los datos con los que el modelo fue entrenado (ej. imágenes de veranos soleados). Esto degrada el rendimiento.
+> Detectar cuándo el modelo está "envejeciendo". El Model Drift ocurrirá cuando las características de los datos de entrada en producción (ej. imágenes de Bogotá) empiezan a diferir significativamente de los datos con los que el modelo fue entrenado (ej. imágenes de San Carlos o de unos atardeceres bien instagrameables). Esto degrada el rendimiento.
 >
 > **Implementación:**
-> 1.  **Data Drift:** Guardar estadísticas (media, desviación estándar, percentiles) de las *features* extraídas durante el entrenamiento.
+> 1.  **Data Drift:** Guarda estadísticas (media, desviación estándar, percentiles) de las *features* extraídas durante el entrenamiento.
 > 2.  En producción, calcular las mismas estadísticas sobre las *features* de las últimas 1000 imágenes, por ejemplo.
 > 3.  Comparar las dos distribuciones usando una prueba estadística (como la de **Kolmogorov-Smirnov**).
 > 4.  Si la diferencia supera un umbral, enviar una alerta. Esto es una señal de que el modelo necesita ser re-entrenado.
 >
-> *Alternativas: Librerías como **Evidently AI** o **NannyML** se especializan en la detección de drift.*
+> *Alternativas: Puedo considerar librerías como **Evidently AI** o **NannyML** que se especializan en la detección de drift.*
 
 ### Tarea Continua 3: A/B Testing de Modelos
 
@@ -857,25 +870,26 @@ jobs:
 > Desplegar un nuevo modelo sin arriesgar la estabilidad del sistema. En lugar de reemplazar directamente el modelo v1 por el v2, se despliegan ambos. El `ModelService` se modifica para enrutar una pequeña porción del tráfico (ej. 10%) al nuevo modelo v2, y el resto al v1.
 >
 > **Justificación:**
-> Esto permite comparar el rendimiento de ambos modelos en datos de producción reales y con usuarios reales. Si el modelo v2 demuestra ser superior (y no causa errores inesperados), se puede aumentar gradualmente el tráfico hasta que reciba el 100%, momento en el que el v1 se retira. Esta técnica se conoce como **Canary Deployment**.
+> Esto me permitirá comparar el rendimiento de ambos modelos en datos de producción reales y con usuarios reales. Si el modelo v2 demuestra ser superior (y no causa errores inesperados), se puede aumentar gradualmente el tráfico hasta que reciba el 100%, momento en el que el v1 se retira. Es decir, un Canary Deployment.
 
 ---
 
 ## CONCLUSIÓN: DE BÁSICO A ML ENGINEER AVANZADO
 
-Al completar estas fases, no solo habrás construido un sistema de estimación de PM2.5 de punta a punta, sino que habrás dominado el ciclo de vida completo de un producto de Machine Learning.
+Al completar estas fases, no solo habré construido un sistema de estimación de PM2.5 de punta a punta, sino que habré dominado el ciclo de vida completo de un producto de Machine Learning.
 
-**Lo que has logrado y aprendido:**
+Espero para este momento haber conseguido lo sigueinte:
 
-1.  **Fundamentos Científicos:** Entender el dominio del problema antes de modelar.
+0. **Pasar una chimba:** Si no, entonces para qué lo hago?
+1.  **Fundamentos Científicos:** Dominar la base del problema antes de modelar.
 2.  **Gestión de Datos:** Versionado y validación de datasets.
 3.  **Ingeniería de Características (Features):** Extracción de señales significativas a partir de datos brutos.
 4.  **Modelado Avanzado:** Uso de técnicas robustas como ensamblajes y cuantificación de incertidumbre.
 5.  **Validación Rigurosa:** Evaluación de modelos más allá de las métricas estándar.
-6.  **Infraestructura como Código (IaC):** Gestión de recursos en la nube de forma reproducible con Terraform.
+6.  **Infraestructura como Código (IaC):** Gestión de recursos en la nube de forma reproducible.
 7.  **Contenerización:** Empaquetado de aplicaciones con Docker.
 8.  **Despliegue (Serving):** Exposición de un modelo de ML a través de una API REST.
 9.  **CI/CD:** Automatización del proceso de testing y despliegue.
 10. **MLOps (Operaciones de ML):** Monitoreo, re-entrenamiento automatizado y detección de drift.
 
-Este proyecto, ejecutado con la profundidad descrita, te posiciona firmemente como un **ML Engineer avanzado**, capaz no solo de entrenar un modelo, sino de construir, desplegar y mantener sistemas de ML robustos, escalables y confiables en un entorno de producción.
+
