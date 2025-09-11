@@ -6,6 +6,13 @@ Bienvenido a la documentación central del proyecto 2.5Vision. Este es el punto 
 
 La base de nuestro modelo de Machine Learning se apoya en una investigación rigurosa del dominio del problema.
 
+Podemos dividir el alcance en tres dominios clave: 
+- El *qué*: la luz interactuando con material particulado suspendido en la atmósfera.
+- El *cómo*: análisis de imágenes usando visión artificial.
+- El *porqué*: los sensores fotográficos como los traductores análogos-digitales perfectos para este problema.
+
+Daremos una respuesta fundamentada a esto en los siguientes apartados:
+
 - **[Revisión de Literatura](./scientific_background/01_literature_review.md):** Un resumen de los papers y estudios más influyentes en la estimación de PM2.5 a través de imágenes.
 - **[Teoría de Ingeniería de Características](./scientific_background/02_feature_engineering_theory.md):** Análisis de las características visuales que correlacionan con la polución atmosférica.
 - **[Análisis de Benchmarks](./scientific_background/03_benchmark_analysis.md):** Comparativa de los modelos y resultados del estado del arte.

@@ -1,18 +1,19 @@
 # Plantilla de Revisión de Literatura
+---
+## Nombre
 
 - **Referencia Completa:** (Ej: Autor, A. (Año). Título del paper. *Nombre de la Revista*, Volumen(Issue), pp-pp.)
 - **Link:** [URL al PDF o página del paper]
 - **Fecha de Revisión:** YYYY-MM-DD
 
----
 
-## Resumen (Abstract en tus palabras)
+
+### Resumen (Abstract en tus palabras)
 
 (Describe en 2-3 frases el objetivo principal del estudio, su método y su hallazgo clave. ¿Qué problema intentaron resolver?)
 
----
 
-## Metodología Utilizada
+### Metodología Utilizada
 
 (Describe el enfoque técnico que usaron. ¿Qué tipo de modelo? ¿Qué datos usaron? ¿Cómo fue su pipeline de procesamiento?)
 
@@ -21,9 +22,8 @@
 - **Ingeniería de Características (Features):**
 - **Métricas de Evaluación:**
 
----
 
-## Hallazgos Clave y Resultados
+### Hallazgos Clave y Resultados
 
 (Enumera los descubrimientos más importantes. ¿Qué características fueron más predictivas? ¿Qué rendimiento alcanzaron? ¿Hubo resultados sorprendentes?)
 
@@ -31,9 +31,8 @@
 2.  **Hallazgo 2:** ...
 3.  **Hallazgo 3:** ...
 
----
 
-## Relevancia y Aplicabilidad para 2.5Vision
+### Relevancia y Aplicabilidad para 2.5Vision
 
 (Esta es la sección más importante. Conecta la investigación con tu proyecto.)
 
@@ -42,9 +41,9 @@
 - **¿Cómo se compara su enfoque con el nuestro?**
 - **Riesgos o advertencias:** (Ej: "Su método requiere imágenes de muy alta resolución que quizás no tengamos.")
 
----
 
-## Preguntas Abiertas y Próximos Pasos
+
+### Preguntas Abiertas y Próximos Pasos
 
 (¿Qué preguntas te deja este paper? ¿Qué te gustaría investigar a continuación a raíz de esto?)
 
