@@ -53,13 +53,13 @@ Utiliza métodos de visión artificial para identificar cambios en las nubes deb
 
 - **Referencia Completa:** (Ej: Autor, A. (Año). Título del paper. *Nombre de la Revista*, Volumen(Issue), pp-pp.)
 - **Link:** [[Paper original](https://www.sciencedirect.com/science/article/pii/S0160412025002478)]
-- **Fecha de Revisión:** YYYY-MM-DD
+- **Fecha de Revisión:** 2025-09-11
 
 
 
 ### Resumen (Abstract en tus palabras)
 
-(Describe en 2-3 frases el objetivo principal del estudio, su método y su hallazgo clave. ¿Qué problema intentaron resolver?)
+A partir de videos busca establecer parámetros de calidad de aire. Es clave el uso de video porque: es necesario modelos que mantengan una complejidad lineal, permite ver la evolución espacio temporal de los aerosoles. Obtiuvieron una correlación por encima del 92%
 
 
 ### Metodología Utilizada
@@ -67,7 +67,11 @@ Utiliza métodos de visión artificial para identificar cambios en las nubes deb
 (Describe el enfoque técnico que usaron. ¿Qué tipo de modelo? ¿Qué datos usaron? ¿Cómo fue su pipeline de procesamiento?)
 
 - **Dataset:**
+Fueron videos de 20 fps y 10s de duracion en hd. Luego se estandraízo a 224 x 224, se normalizaron los pixles a [1,0].
 - **Modelo(s):**
+    - Utiliza un SSM, es decir, va evolucionando sus reglas de selección.
+    - Utiliza un modelo de clasificación (para los niveles de air quality) y otro de regresión (para los valores de material particulado). 
+    - Tokeniza los frames para darle un contexto al modelo. Es decir, no le envía la matriz de valores de pixel sino que le envía tubulets enriquecidos en contexto (bordes, texturas, etc). La tokenización garantiza que el modelo realice menos operaciones (si se trata de un transformer o de un SSM)
 - **Ingeniería de Características (Features):**
 - **Métricas de Evaluación:**
 
