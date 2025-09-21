@@ -13,3 +13,7 @@ Para fines prácticos vamos a cometer un *crimen*: describir el comportamiento q
 La luz que protagoniza el estudio proviene del Sol. Es luz blanca, lo que signfica que *"contiente"* todos los colores. Un rayo de luz blanca es, en escencia, grupos de ondas electromagnéticas viajando con diferentes frecuencias. Esta frecuencia es, en escencia, la que dota de un color diferente a este rayo de luz. 
 
 Es importante aclarar que no es que sea la "frencuencia del color" como tal, es simplemente que las ondas electromagnéticas que interactualn con las células que confomran el ojo humano desencaden impulsos nervisos diferentes segun la frecuencia de la onda incidente, en donde el crebro interpreta estos impulsos diferentes como colores difrentes. De hecho, esto es solo un pequeño rango de frecuencias, la gran cantidad de luz que catalogamos *no visible* es porque su frencuencia no es la que los bastones presnetan sensibilidad. Esto último, a pesar de que es una adición a la contextualizacipón del concpeto de la luz, jugará un papel crucial para entender etapas claves del proyecto.
+
+### 1.2 Los aerosoles
+
+### 1.3 Interacción Luz - Areosol
