@@ -99,7 +99,7 @@ graph TB
     end
 ```
 
-#### Technical Specification
+<!-- #### Technical Specification
 
 ##### Documento ADR (Architecture Decision Records):
 
@@ -114,14 +114,14 @@ Sería algo así:
 ├── 003-deployment-strategy.md
 ├── 004-monitoring-approach.md
 └── 005-data-pipeline-design.md
-```
+``` -->
 
 ### Etapa 2: Development Setup
 
 #### Infraestructura como Código
 
 > **Objetivo:**
-> Automatizar la creación de la infraestructura en la nube. Usar Terraform (o cloudeformation) previene el "click-ops" (configuración manual en la consola de AWS), lo que garantiza que el entorno sea reproducible, versionable y fácil de destruir y recrear. Hablo de AWS porque con toda seguridad tenga la solución allí.
+> Automatizar la creación de la infraestructura en la nube. Usar Terraform (o cloudeformation) previene el "click-ops" (configuración manual en la consola de AWS), lo que garantiza que el entorno sea reproducible, versionable y fácil de destruir y recrear.
 
 Me debo de asegurar en priemra instancia de:
 - La creación del servidor (y de un scheduler).
