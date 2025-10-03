@@ -65,10 +65,10 @@ Crear un sistema ML para estimación de PM2.5 que contribuya de manera científi
 
 > **Justificación de Decisiones:**
 > Las decisiones aquí están optimizadas para el aprendizaje y el bajo costo, sin sacrificar los estándares de la industria.
-> - **ML Framework:** Entran en juego Pytorch y TensorFlow/Keras
-> - **Model Serving:** Seguramente tendré que sacrificar algunas funcionalidades por costos, pero se decidirá entre TorchServe en un EC2, SageMaker, un Uvicorn con FastAPI (full backend mood), Knativ en Kubernetes.
-> - **Feature Store:** Teneindo en cuenta la naturaleza de estos datos (y que actualmtne tengo algunos en una postgres), tendré que decidir entre continuar con postgres, un custom SQLite, Feast, Tecton  o simplemente archivos Parquet en S3 con una buena convención de nombrado.
-> - **Monitoring (Custom + CloudWatch):** Por facilidad viene CloudWatch, pero por costos quizás revise un Prometheus/Grafana.
+> - **ML Framework:** Entran en juego Pytorch y TensorFlow/Keras. Voy a usar Pytorch por su flexibilidad, sabiendo que pierdo las ventajas de Keras para ambientes en producción,
+> - **Model Serving:** Mis alternativas fueron: TorchServe en un EC2, SageMaker, un Uvicorn con FastAPI (full backend mood), Knativ en Kubernetes. Con la decisión del ML framework se hace más directo elegir entonces un TorchServe en un EC2
+> - **Feature Store:** Teneindo en cuenta la naturaleza de estos datos (y a pesar de que actualmtne tengo algunos en una postgres), me decido por una custom SQLite.
+> - **Monitoring (Custom + CloudWatch):** Por facilidad viene CloudWatch, pero por costos quizás revise un Prometheus/Grafana en un futuro.
 ##### Diseño Técnico Completo (agnósitco a las decisiones anteriores):
 ```mermaid
 graph TB
