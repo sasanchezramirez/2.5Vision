@@ -16,4 +16,6 @@ Es importante aclarar que no es que sea la "frencuencia del color" como tal, es 
 
 ### 1.2 Los aerosoles
 
+En este contexto el concepto  de aerosol se refiere a todas aqueyas partículas constituyentes de la atmósfera. En particular, por la naturalieza de nuestro estudio, se acota tanto a las partículas antropogénicas subrpoductos de, por lo general, cobsution y también a las moléculas de agua suspendidas en la capa baja. s
+
 ### 1.3 Interacción Luz - Areosol
