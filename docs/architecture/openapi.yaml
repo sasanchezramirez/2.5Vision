@@ -1,0 +1,44 @@
+openapi: 3.0.0
+info:
+  title: "2.5Vision API"
+  version: "1.0.0"
+  description: "API para la estimación de PM2.5 a partir de imágenes."
+
+paths:
+  /predict:
+    post:
+      summary: "Estima el PM2.5 de una imagen"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: "Imagen para analizar."
+      responses:
+        '200':
+          description: "Estimación exitosa"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pm25_estimate:
+                    type: number
+                    format: float
+                    example: 25.5
+                  uncertainty:
+                    type: number
+                    format: float
+                    example: 4.2
+                  model_version:
+                    type: string
+                    example: "v1.2.0-alpha"
+        '400':
+          description: "Error en la solicitud (ej. archivo no es imagen)"
+        '500':
+          description: "Error interno del servidor"
